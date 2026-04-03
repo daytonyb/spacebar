@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Where's My Spacebar?</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="gameContainer">
+        <canvas id="gameCanvas" width="640" height="320"></canvas>
+
+        <div id="hudLevelName" class="hidden"></div>
+        
+        <div id="uiLayer">
+            
+            <div id="mainMenu" class="menu-screen">
+                <h1>Where's My Spacebar?</h1>
+                <button id="btnStartGame">Start Game</button>
+                <button id="btnSettings">Settings</button>
+            </div>
+
+            <div id="settingsMenu" class="menu-screen hidden">
+                <h1>Settings</h1>
+                
+                <div class="keybind-list">
+                    <div class="keybind-row"><span>Up:</span> <button id="bind-up" class="bind-btn">ArrowUp</button></div>
+                    <div class="keybind-row"><span>Down:</span> <button id="bind-down" class="bind-btn">ArrowDown</button></div>
+                    <div class="keybind-row"><span>Left:</span> <button id="bind-left" class="bind-btn">ArrowLeft</button></div>
+                    <div class="keybind-row"><span>Right:</span> <button id="bind-right" class="bind-btn">ArrowRight</button></div>
+                    <div class="keybind-row"><span>Jump:</span> <button id="bind-jump" class="bind-btn">Space</button></div>
+                    <div class="keybind-row"><span>Dash:</span> <button id="bind-dash" class="bind-btn">ShiftLeft</button></div>
+                </div>
+
+                <div style="margin-top: 15px;">
+                    <button id="btnResetBinds" style="background-color: #ff9900;">Reset Controls</button>
+                    <button id="btnResetData" style="background-color: #cc0000;">Erase Save Data</button>
+                </div>
+                <button id="btnSettingsBack" class="back-btn">Back</button>
+            </div>
+
+            <div id="stageSelectMenu" class="menu-screen hidden">
+                <h1>Select Stage</h1>
+                <div id="stageGrid" class="grid"></div>
+                <button id="btnStageBack" class="back-btn">Back</button>
+            </div>
+
+            <div id="levelSelectMenu" class="menu-screen hidden">
+                <h1 id="levelSelectTitle">Select Level</h1>
+                <div id="levelGrid" class="grid"></div>
+                <button id="btnLevelBack" class="back-btn">Back</button>
+            </div>
+
+        </div>
+    </div>
+    
+    <script src="game.js"></script>
+</body>
+</html>

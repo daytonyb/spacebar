@@ -1,0 +1,164 @@
+body {
+    margin: 0;
+    background-color: #1a1a1a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    font-family: sans-serif;
+    overflow: hidden; /* This prevents annoying scrollbars when the game touches the edges */
+}
+
+#gameContainer {
+    position: relative;
+    width: min(100vw, calc(100vh * 2)); 
+    aspect-ratio: 2 / 1; /* Locks it perfectly to your 640x320 resolution */
+    
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+}
+
+canvas {
+    background-color: #2a2a2a;
+    border: 4px solid #555;
+    image-rendering: pixelated; 
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+}
+
+/* UI Overlay */
+#uiLayer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(26, 26, 26, 0.95);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-align: center;
+    border: 4px solid #555;
+    box-sizing: border-box;
+}
+
+.menu-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+.hidden {
+    display: none !important;
+}
+
+h1 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #00ff88;
+}
+
+button {
+    background-color: #ff3366;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+
+button:hover:not(:disabled) {
+    background-color: #ff668c;
+}
+
+button:disabled {
+    background-color: #555;
+    color: #888;
+    cursor: not-allowed;
+}
+
+.grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    max-width: 90%;
+    max-height: 180px;
+    overflow-y: auto;
+    margin-bottom: 20px;
+}
+
+.grid button {
+    width: 45px;
+    padding: 10px 0;
+    margin: 0;
+}
+
+.back-btn {
+    background-color: #666;
+}
+.back-btn:hover {
+    background-color: #888;
+}
+
+/* In-Game HUD */
+#hudLevelName {
+    position: absolute;
+    top: 24px;
+    width: 100%;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 24px;
+    font-weight: bold;
+    pointer-events: none; /* This ensures the text never accidentally blocks clicks */
+    text-shadow: 2px 2px 0px rgba(0,0,0,0.8); /* Adds a nice drop shadow! */
+}
+
+/* --- Settings & Keybinds --- */
+.keybind-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 15px;
+    border-radius: 8px;
+    border: 2px solid #555;
+    width: 250px;
+}
+
+.keybind-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 18px;
+}
+
+.bind-btn {
+    width: 120px;
+    margin: 0;
+    background-color: #00ccff;
+    color: #1a1a1a;
+}
+
+.bind-btn:hover {
+    background-color: #66e0ff;
+}
+
+.bind-btn.waiting {
+    background-color: #ffd700;
+    animation: pulse 1s infinite alternate;
+}
+
+@keyframes pulse {
+    from { opacity: 1; }
+    to { opacity: 0.6; }
+}
