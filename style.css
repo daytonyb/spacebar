@@ -162,3 +162,41 @@ button:disabled {
     from { opacity: 1; }
     to { opacity: 0.6; }
 }
+
+/* --- Speedrun Timer UI --- */
+#hudTimer {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    color: #00ff88;
+    font-size: 20px;
+    font-family: monospace;
+    font-weight: bold;
+    pointer-events: none;
+    text-shadow: 2px 2px 0px rgba(0,0,0,0.8);
+}
+
+#timeTooltip {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.9);
+    color: #00ff88;
+    padding: 6px 12px;
+    border-radius: 4px;
+    border: 2px solid #555;
+    pointer-events: none;
+    z-index: 100;
+    font-family: monospace;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+.select-btn {
+    text-align: center;
+    padding: 5px;
+    font-family: inherit;
+    font-weight: bold;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    appearance: none; /* Removes default dropdown arrow to keep it clean */
+}
