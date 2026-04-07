@@ -11,6 +11,8 @@
         <canvas id="gameCanvas" width="640" height="320"></canvas>
 
         <div id="hudLevelName" class="hidden"></div>
+        <div id="hudTimer" class="hidden">00:00.000</div>
+        <div id="timeTooltip" class="hidden">Best: 00:00.000</div>
         
         <div id="uiLayer">
             
@@ -30,6 +32,16 @@
                     <div class="keybind-row"><span>Right:</span> <button id="bind-right" class="bind-btn">ArrowRight</button></div>
                     <div class="keybind-row"><span>Jump:</span> <button id="bind-jump" class="bind-btn">Space</button></div>
                     <div class="keybind-row"><span>Dash:</span> <button id="bind-dash" class="bind-btn">ShiftLeft</button></div>
+                    
+                    <div class="keybind-row" style="margin-top: 10px; border-top: 1px solid #555; padding-top: 10px;">
+                        <span>Timer:</span> 
+                        <select id="timerSelect" class="bind-btn select-btn">
+                            <option value="none">None</option>
+                            <option value="levels">Levels</option>
+                            <option value="stages">Stages</option>
+                            <option value="game">Whole Game</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div style="margin-top: 15px;">
