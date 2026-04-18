@@ -103,6 +103,34 @@ button:disabled {
     margin: 0;
 }
 
+.records-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: min(360px, 85%);
+    max-height: 190px;
+    overflow-y: auto;
+    padding: 16px;
+    margin-bottom: 20px;
+    background-color: rgba(0, 0, 0, 0.5);
+    border: 2px solid #555;
+    border-radius: 8px;
+    box-sizing: border-box;
+}
+
+.record-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    font-size: 18px;
+}
+
+.record-row span:last-child {
+    color: #00ff88;
+    font-family: monospace;
+}
+
 .back-btn {
     background-color: #666;
 }

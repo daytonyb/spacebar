@@ -2,6 +2,7 @@ const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
 const TILE_SIZE = 32;
+const TUTORIAL_STAGE_INDEX = 0;
 
 // --- STAGE & ROOM DATA ---
 let currentStageIndex = 0;
@@ -263,7 +264,11 @@ let timerMode = localStorage.getItem("timerMode") || "none";
 let startTime = 0;
 let elapsed = 0;
 let isTimerRunning = false;
+let activeTimerRecordKey = null;
+let isWholeGameRun = false;
 let bestTimes = JSON.parse(localStorage.getItem("bestTimes")) || {}; 
+let completedStages = JSON.parse(localStorage.getItem("completedStages")) || {};
+const stageButtons = [];
 
 const hudTimer = document.getElementById("hudTimer");
 const hudLevelName = document.getElementById("hudLevelName");
@@ -295,18 +300,101 @@ function formatTime(ms) {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}.${millis.toString().padStart(3, '0')}`;
 }
 
+function persistBestTimes() {
+    localStorage.setItem("bestTimes", JSON.stringify(bestTimes));
+}
+
+function persistCompletedStages() {
+    localStorage.setItem("completedStages", JSON.stringify(completedStages));
+}
+
+function hasBestTime(key) {
+    return Object.prototype.hasOwnProperty.call(bestTimes, key);
+}
+
+function hasCompletedStage(stageIndex) {
+    return Boolean(completedStages[stageIndex]);
+}
+
+function getStageBestKey(stageIndex) {
+    return `stage_${stageIndex}`;
+}
+
+function getVisibleBestTimeKey() {
+    if (gameState !== "playing") return null;
+    if (timerMode === "stages") return getStageBestKey(currentStageIndex);
+    return activeTimerRecordKey;
+}
+
+function sanitizeBestTimes() {
+    if (!hasBestTime("full_game")) return;
+
+    const hasInvalidWholeGameTime = stages.some((stage, index) => {
+        const stageKey = getStageBestKey(index);
+        return hasBestTime(stageKey) && bestTimes.full_game < bestTimes[stageKey];
+    });
+
+    if (hasInvalidWholeGameTime) {
+        delete bestTimes.full_game;
+        persistBestTimes();
+    }
+}
+
+sanitizeBestTimes();
+
+function syncCompletedStages() {
+    let changed = false;
+
+    if (hasBestTime("full_game")) {
+        for (let i = 0; i < stages.length; i++) {
+            if (!hasCompletedStage(i)) {
+                completedStages[i] = true;
+                changed = true;
+            }
+        }
+    }
+
+    for (let i = 0; i < stages.length; i++) {
+        if (!hasBestTime(getStageBestKey(i))) continue;
+
+        for (let completedIndex = 0; completedIndex <= i; completedIndex++) {
+            if (!hasCompletedStage(completedIndex)) {
+                completedStages[completedIndex] = true;
+                changed = true;
+            }
+        }
+    }
+
+    if (changed) persistCompletedStages();
+}
+
+function isStageUnlocked(stageIndex) {
+    return stageIndex === TUTORIAL_STAGE_INDEX || hasCompletedStage(stageIndex - 1);
+}
+
+function markStageCompleted(stageIndex) {
+    if (hasCompletedStage(stageIndex)) return;
+
+    completedStages[stageIndex] = true;
+    persistCompletedStages();
+}
+
+syncCompletedStages();
+
 function saveBestTime() {
-    let key = timerMode === "stages" ? `stage_${currentStageIndex}` : "full_game";
-    if (!bestTimes[key] || elapsed < bestTimes[key]) {
+    if (!activeTimerRecordKey) return;
+
+    let key = activeTimerRecordKey;
+    if (!hasBestTime(key) || elapsed < bestTimes[key]) {
         bestTimes[key] = elapsed;
-        localStorage.setItem("bestTimes", JSON.stringify(bestTimes));
+        persistBestTimes();
     }
 }
 
 hudTimer.addEventListener("mouseenter", () => {
-    let key = timerMode === "stages" ? `stage_${currentStageIndex}` : "full_game";
-    let best = bestTimes[key];
-    timeTooltip.innerText = best ? `Best: ${formatTime(best)}` : "Best: --:--.---";
+    let key = getVisibleBestTimeKey();
+    let best = key ? bestTimes[key] : null;
+    timeTooltip.innerText = key && hasBestTime(key) ? `Best: ${formatTime(best)}` : "Best: --:--.---";
     timeTooltip.classList.remove("hidden");
 });
 
@@ -340,7 +428,7 @@ window.addEventListener("keydown", (e) => {
     if (e.code === userBinds.up) keys.up = true;
     if (e.code === userBinds.down) keys.down = true;
     if (e.code === "KeyR") die();
-    if (e.code === "Escape") endGameplay();
+    if (e.code === "Escape") endGameplay(false);
 
     if (e.code === userBinds.jump && !jumpPressed) {
         jumpPressed = true;
@@ -497,7 +585,7 @@ function checkInteractions(px, py) {
     if (tile === 2) { map[cy][cx] = 0; player.potions++; }
     else if (tile === 7 && !player.hasDash) { map[cy][cx] = 0; player.hasDash = true; }
     else if (tile === 4) activeCheckpoint = { rx: currentRoomX, ry: currentRoomY, px: cx * TILE_SIZE + 4, py: cy * TILE_SIZE + 4, cx, cy };
-    else if (tile === 8) endGameplay();
+    else if (tile === 8) { finishStage(); return; }
     else if (tile === 14) {
         map[cy][cx] = 0; // Remove the key from the map
         keysCollected++;
@@ -748,39 +836,105 @@ function loop(timestamp) {
 // --- UI & MENUS ---
 const uiLayer = document.getElementById("uiLayer");
 const stageGrid = document.getElementById("stageGrid");
-const menus = { main: document.getElementById("mainMenu"), settings: document.getElementById("settingsMenu"), stageSelect: document.getElementById("stageSelectMenu") };
+const bestTimesList = document.getElementById("bestTimesList");
+const menus = {
+    main: document.getElementById("mainMenu"),
+    settings: document.getElementById("settingsMenu"),
+    stageSelect: document.getElementById("stageSelectMenu"),
+    bestTimes: document.getElementById("bestTimesMenu")
+};
 
 function showScreen(screenName) {
     Object.values(menus).forEach(m => { if (m) m.classList.add("hidden"); });
     if (menus[screenName]) menus[screenName].classList.remove("hidden");
+    if (screenName === "stageSelect") refreshStageButtons();
+}
+
+function getSavedTimeLabel(key) {
+    return hasBestTime(key) ? formatTime(bestTimes[key]) : "no time";
+}
+
+function renderBestTimes() {
+    bestTimesList.innerHTML = "";
+
+    stages.forEach((stage, index) => {
+        let row = document.createElement("div");
+        row.className = "record-row";
+        row.innerHTML = `<span>${stage.title}</span><span>${getSavedTimeLabel(`stage_${index}`)}</span>`;
+        bestTimesList.appendChild(row);
+    });
+
+    let fullGameRow = document.createElement("div");
+    fullGameRow.className = "record-row";
+    fullGameRow.innerHTML = `<span>Whole Game</span><span>${getSavedTimeLabel("full_game")}</span>`;
+    bestTimesList.appendChild(fullGameRow);
+}
+
+function refreshStageButtons() {
+    stageButtons.forEach(({ button, index, title }) => {
+        const unlocked = isStageUnlocked(index);
+        button.disabled = !unlocked;
+        button.innerText = unlocked ? title : `${title} (Locked)`;
+    });
+}
+
+function loadStage(stageIndex) {
+    currentStageIndex = stageIndex;
+    activeCheckpoint = null;
+    activeSignText = null;
+    loadRoom(0, 0, 'spawn');
 }
 
 function startGameplay(stageIndex) {
-    currentStageIndex = stageIndex;
     gameState = "playing";
-    activeCheckpoint = null;
     uiLayer.style.display = "none";
     hudLevelName.classList.remove("hidden"); 
 
-    if (timerMode !== "none") {
+    isWholeGameRun = timerMode === "game" && stageIndex === TUTORIAL_STAGE_INDEX;
+    activeTimerRecordKey = timerMode === "stages"
+        ? getStageBestKey(stageIndex)
+        : (isWholeGameRun ? "full_game" : null);
+
+    if (timerMode === "stages" || isWholeGameRun) {
         hudTimer.classList.remove("hidden");
         startTime = performance.now();
         elapsed = 0;
         isTimerRunning = true;
     } else {
         hudTimer.classList.add("hidden");
+        isTimerRunning = false;
+        elapsed = 0;
     }
 
-    loadRoom(0, 0, 'spawn');
+    loadStage(stageIndex);
 }
 
-function endGameplay() {
-    if (isTimerRunning) { isTimerRunning = false; saveBestTime(); }
+function finishStage() {
+    markStageCompleted(currentStageIndex);
+    refreshStageButtons();
+
+    if (isWholeGameRun && currentStageIndex < stages.length - 1) {
+        loadStage(currentStageIndex + 1);
+        return;
+    }
+
+    endGameplay(true);
+}
+
+function endGameplay(completed = false) {
+    if (isTimerRunning) {
+        if (completed) saveBestTime();
+        isTimerRunning = false;
+    }
+
+    activeTimerRecordKey = null;
+    isWholeGameRun = false;
     gameState = "menu";
     uiLayer.style.display = "flex";
     hudLevelName.classList.add("hidden"); 
     hudTimer.classList.add("hidden");
-    showScreen("stageSelect"); 
+    timeTooltip.classList.add("hidden");
+    showScreen(timerMode === "game" ? "main" : "stageSelect"); 
 }
 
 // Init Stage Select
@@ -790,11 +944,17 @@ stages.forEach((stage, index) => {
     btn.style.width = "auto"; btn.style.padding = "10px 15px";
     btn.onclick = () => startGameplay(index);
     stageGrid.appendChild(btn);
+    stageButtons.push({ button: btn, index, title: stage.title });
 });
 
 // Menu Logic
-document.getElementById("btnStartGame").onclick = () => showScreen("stageSelect");
+document.getElementById("btnStartGame").onclick = () => {
+    if (timerMode === "game") startGameplay(TUTORIAL_STAGE_INDEX);
+    else showScreen("stageSelect");
+};
+document.getElementById("btnBestTimes").onclick = () => { renderBestTimes(); showScreen("bestTimes"); };
 document.getElementById("btnStageBack").onclick = () => showScreen("main");
+document.getElementById("btnBestTimesBack").onclick = () => showScreen("main");
 document.getElementById("btnSettings").onclick = () => { refreshBindUI(); showScreen("settings"); };
 document.getElementById("btnSettingsBack").onclick = () => { if (rebindingAction) document.getElementById(`bind-${rebindingAction}`).classList.remove("waiting"); rebindingAction = null; showScreen("main"); };
 document.getElementById("btnResetBinds").onclick = () => { userBinds = { ...defaultBinds }; localStorage.setItem("spacebarBinds", JSON.stringify(userBinds)); refreshBindUI(); };
