@@ -19,6 +19,7 @@
             <div id="mainMenu" class="menu-screen">
                 <h1>Where's My Spacebar?</h1>
                 <button id="btnStartGame">Start Game</button>
+                <button id="btnSpeedrun">Speedrun</button>
                 <button id="btnBestTimes">Stats</button>
                 <button id="btnSettings">Settings</button>
             </div>
@@ -36,10 +37,9 @@
                     
                     <div class="keybind-row" style="margin-top: 10px; border-top: 1px solid #555; padding-top: 10px;">
                         <span>Timer:</span> 
-                        <select id="timerSelect" class="bind-btn select-btn">
-                            <option value="none">None</option>
-                            <option value="stages">Stages</option>
-                            <option value="game">Whole Game</option>
+                        <select id="timerVisibilitySelect" class="bind-btn select-btn">
+                            <option value="visible">Visible</option>
+                            <option value="hidden">Hidden</option>
                         </select>
                     </div>
                 </div>
@@ -58,7 +58,7 @@
             </div>
 
             <div id="bestTimesMenu" class="menu-screen hidden">
-                <h1>Best Times</h1>
+                <h1>Stats</h1>
                 <div id="bestTimesList" class="records-list"></div>
                 <button id="btnBestTimesBack" class="back-btn">Back</button>
             </div>
