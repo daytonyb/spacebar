@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Level Editor - Where's My Spacebar?</title>
+    <link rel="stylesheet" href="editor.css">
+</head>
+<body>
+    <div class="editor-container">
+        <h1>Level Editor</h1>
+        
+        <div class="main-workspace">
+            <canvas id="editorCanvas" width="640" height="320"></canvas>
+            
+            <div class="palette-container">
+                <h3>Tiles</h3>
+                <div id="palette" class="palette-grid">
+                    </div>
+            </div>
+        </div>
+
+        <div class="tools">
+            <button id="btnFill">Fill Map with Selected</button>
+            <button id="btnClear" style="background-color: #cc0000;">Clear Map (Erase All)</button>
+        </div>
+
+        <div class="io-section">
+            <div class="io-controls">
+                <button id="btnExport">Export Code &darr;</button>
+                <button id="btnImport">Import Code &uarr;</button>
+            </div>
+            <textarea id="ioTextarea" placeholder="Click Export to get your array, or paste an array here and click Import..." rows="12"></textarea>
+        </div>
+    </div>
+
+    <script src="editor.js"></script>
+</body>
+</html>
