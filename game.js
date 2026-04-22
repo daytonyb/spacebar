@@ -14,12 +14,29 @@ let activeCheckpoint = null;
 let activeSignText = null;
 let keysCollected = 0;
 let totalKeysInRoom = 0;
+const KEY_TILE = 14;
+const LOCKED_BLOCK_TILE = 15;
 const CRUMBLE_TILE = 16;
 const DASH_THROUGH_TILE = 17;
 const DASH_DRAIN_TILE = 18;
+const ESCORT_KEY_TILE = 19;
+const ESCORT_LOCK_TILE = 20;
+const PORTAL_TILE = 21;
+const BOUNCE_TILE = 22;
+const LEFT_WIND_TILE = 23;
+const RIGHT_WIND_TILE = 24;
+const UP_WIND_TILE = 25;
+const DOWN_WIND_TILE = 26;
 const CRUMBLE_DURATION = 30;
+const BOUNCE_DASH_MULTIPLIER = 2;
+const WIND_RANGE = 4;
+const WIND_STRENGTH = 0.35;
+const WIND_SPREAD = 1;
 let crumbleTimers = Object.create(null);
 let activeDashDrainTile = null;
+let hasEscortKey = false;
+let activeRoomPortals = [];
+let lockedPortalKey = null;
 
 const stages = [
     {
@@ -130,7 +147,17 @@ const stages = [
             "2,1": "This is the last part of the stage! Good luck!",
             "6,1": "Congratulations!"
         },
-    }
+    },
+    {
+        title: "Stage 3",
+        rooms: {
+
+        },
+        roomNames: {},
+        signs: {
+
+        }
+    },
 ];
 
 // --- TIMER STATE ---
@@ -382,6 +409,7 @@ function loadRoom(rx, ry, entrance = 'spawn') {
     map = JSON.parse(JSON.stringify(currentStage.rooms[roomKey]));
     crumbleTimers = Object.create(null);
     activeDashDrainTile = null;
+    lockedPortalKey = null;
 
     player.vx = 0; 
     player.isDashing = false;
@@ -390,9 +418,10 @@ function loadRoom(rx, ry, entrance = 'spawn') {
 
     keysCollected = 0;
     totalKeysInRoom = 0;
+    refreshRoomPortals();
     for (let y = 0; y < map.length; y++) {
         for (let x = 0; x < map[y].length; x++) {
-            if (map[y][x] === 14) totalKeysInRoom++;
+            if (map[y][x] === KEY_TILE) totalKeysInRoom++;
         }
     }
 
@@ -410,7 +439,7 @@ function loadRoom(rx, ry, entrance = 'spawn') {
                     if (!activeCheckpoint) activeCheckpoint = { rx, ry, px: player.x, py: player.y, cx: x, cy: y };
                 }
                 // Count the keys in the newly loaded room
-                if (map[y][x] === 14) {
+                if (map[y][x] === KEY_TILE) {
                     totalKeysInRoom++;
                 }
             }
@@ -454,7 +483,7 @@ function startDash() {
 
 function isSolidTile(tile) {
     if (tile === DASH_THROUGH_TILE) return !player.isDashing;
-    return tile === 1 || tile === 5 || tile === 12 || tile === 13 || tile === 15 || tile === DASH_DRAIN_TILE;
+    return tile === 1 || tile === 5 || tile === 12 || tile === 13 || tile === LOCKED_BLOCK_TILE || tile === DASH_DRAIN_TILE || tile === BOUNCE_TILE || isWindTile(tile);
 }
 
 function isTouchingTile(px, py, targetTile) {
@@ -492,6 +521,150 @@ function checkCollision(px, py) {
     return false;
 }
 
+function getHorizontalCollisionTile(px, py, direction) {
+    if (direction === 0) return null;
+
+    const edgeX = direction > 0
+        ? Math.floor((px + player.width) / TILE_SIZE)
+        : Math.floor(px / TILE_SIZE);
+    const checkX = Math.max(0, Math.min(edgeX, 19));
+    const top = Math.floor(py / TILE_SIZE);
+    const bottom = Math.floor((py + player.height - 0.1) / TILE_SIZE);
+    let collidedTile = null;
+
+    for (let y = top; y <= bottom; y++) {
+        const tile = map[y] ? map[y][checkX] : null;
+        if (!isSolidTile(tile)) continue;
+        if (tile === BOUNCE_TILE) return tile;
+        collidedTile = tile;
+    }
+
+    return collidedTile;
+}
+
+function getVerticalCollisionTile(px, py, direction) {
+    if (direction === 0) return null;
+
+    const edgeY = direction > 0
+        ? Math.floor((py + player.height) / TILE_SIZE)
+        : Math.floor(py / TILE_SIZE);
+    const left = Math.floor(px / TILE_SIZE);
+    const right = Math.floor((px + player.width - 0.1) / TILE_SIZE);
+    let collidedTile = null;
+
+    for (let x = left; x <= right; x++) {
+        const checkX = Math.max(0, Math.min(x, 19));
+        const tile = map[edgeY] ? map[edgeY][checkX] : null;
+        if (!isSolidTile(tile)) continue;
+        if (tile === BOUNCE_TILE) return tile;
+        collidedTile = tile;
+    }
+
+    return collidedTile;
+}
+
+function getBounceVelocity(velocity) {
+    const multiplier = player.isDashing ? BOUNCE_DASH_MULTIPLIER : 1;
+    return -velocity * multiplier;
+}
+
+function isWindTile(tile) {
+    return tile === LEFT_WIND_TILE || tile === RIGHT_WIND_TILE || tile === UP_WIND_TILE || tile === DOWN_WIND_TILE;
+}
+
+function getWindDirection(tile) {
+    if (tile === LEFT_WIND_TILE) return { dx: -1, dy: 0 };
+    if (tile === RIGHT_WIND_TILE) return { dx: 1, dy: 0 };
+    if (tile === UP_WIND_TILE) return { dx: 0, dy: -1 };
+    if (tile === DOWN_WIND_TILE) return { dx: 0, dy: 1 };
+    return null;
+}
+
+function doesPlayerOverlapTile(tileX, tileY) {
+    const left = Math.floor(player.x / TILE_SIZE);
+    const right = Math.floor((player.x + player.width - 0.1) / TILE_SIZE);
+    const top = Math.floor(player.y / TILE_SIZE);
+    const bottom = Math.floor((player.y + player.height - 0.1) / TILE_SIZE);
+    return tileX >= left && tileX <= right && tileY >= top && tileY <= bottom;
+}
+
+function forEachWindBeamCell(callback) {
+    for (let sourceY = 0; sourceY < map.length; sourceY++) {
+        for (let sourceX = 0; sourceX < map[sourceY].length; sourceX++) {
+            const direction = getWindDirection(map[sourceY][sourceX]);
+            if (!direction) continue;
+
+            for (let lane = -WIND_SPREAD; lane <= WIND_SPREAD; lane++) {
+                for (let step = 1; step <= WIND_RANGE; step++) {
+                    const targetX = sourceX + direction.dx * step + (direction.dy !== 0 ? lane : 0);
+                    const targetY = sourceY + direction.dy * step + (direction.dx !== 0 ? lane : 0);
+                    if (!map[targetY] || targetX < 0 || targetX >= map[targetY].length) break;
+                    if (isSolidTile(map[targetY][targetX])) break;
+
+                    callback({ sourceX, sourceY, targetX, targetY, direction, lane, step });
+                }
+            }
+        }
+    }
+}
+
+function applyWindForces() {
+    let windX = 0;
+    let windY = 0;
+    const activeWindSources = new Set();
+
+    forEachWindBeamCell(({ sourceX, sourceY, targetX, targetY, direction }) => {
+        if (!doesPlayerOverlapTile(targetX, targetY)) return;
+
+        const sourceKey = `${sourceX},${sourceY}`;
+        if (activeWindSources.has(sourceKey)) return;
+
+        activeWindSources.add(sourceKey);
+        windX += direction.dx * WIND_STRENGTH;
+        windY += direction.dy * WIND_STRENGTH;
+    });
+
+    player.vx += windX;
+    player.vy += windY;
+}
+
+function drawWindBeamEffects() {
+    const windTime = performance.now() * 0.004;
+
+    forEachWindBeamCell(({ targetX, targetY, direction, lane, step }) => {
+        const left = targetX * TILE_SIZE;
+        const top = targetY * TILE_SIZE;
+        const baseFlow = windTime + step * 0.23 + lane * 0.11;
+        const flowA = baseFlow - Math.floor(baseFlow);
+        const flowB = (flowA + 0.5) % 1;
+
+        ctx.fillStyle = "rgba(143, 232, 255, 0.12)";
+        ctx.fillRect(left, top, TILE_SIZE, TILE_SIZE);
+
+        ctx.strokeStyle = "rgba(143, 232, 255, 0.25)";
+        ctx.lineWidth = 1;
+        ctx.strokeRect(left + 0.5, top + 0.5, TILE_SIZE - 1, TILE_SIZE - 1);
+
+        ctx.fillStyle = "rgba(143, 232, 255, 0.75)";
+
+        if (direction.dx !== 0) {
+            const streakStart = direction.dx > 0 ? left + 4 : left + 22;
+            const streakAX = direction.dx > 0 ? streakStart + flowA * 16 : streakStart - flowA * 16;
+            const streakBX = direction.dx > 0 ? streakStart + flowB * 16 : streakStart - flowB * 16;
+
+            ctx.fillRect(streakAX, top + 10, 6, 2);
+            ctx.fillRect(streakBX, top + 20, 6, 2);
+        } else {
+            const streakStart = direction.dy > 0 ? top + 4 : top + 22;
+            const streakAY = direction.dy > 0 ? streakStart + flowA * 16 : streakStart - flowA * 16;
+            const streakBY = direction.dy > 0 ? streakStart + flowB * 16 : streakStart - flowB * 16;
+
+            ctx.fillRect(left + 10, streakAY, 2, 6);
+            ctx.fillRect(left + 20, streakBY, 2, 6);
+        }
+    });
+}
+
 function checkHazards(px, py) {
     let margin = 4;
     let left = Math.floor((px + margin) / TILE_SIZE);
@@ -509,10 +682,11 @@ function checkHazards(px, py) {
 function checkInteractions(px, py) {
     let cx = Math.floor((px + player.width / 2) / TILE_SIZE);
     let cy = Math.floor((py + player.height / 2) / TILE_SIZE);
-    if (!map[cy]) return;
+    if (!map[cy]) return false;
     let tile = map[cy][cx];
 
     activeSignText = null;
+    if (tile !== PORTAL_TILE) lockedPortalKey = null;
 
     // CHECK FOR SIGNS (The simple version!)
     if (tile === 11) {
@@ -528,14 +702,28 @@ function checkInteractions(px, py) {
     if (tile === 2) { map[cy][cx] = 0; player.potions++; }
     else if (tile === 7 && !player.hasDash) { map[cy][cx] = 0; player.hasDash = true; }
     else if (tile === 4) activeCheckpoint = { rx: currentRoomX, ry: currentRoomY, px: cx * TILE_SIZE + 4, py: cy * TILE_SIZE + 4, cx, cy };
-    else if (tile === 8) { finishStage(); return; }
-    else if (tile === 14) {
+    else if (tile === 8) { finishStage(); return true; }
+    else if (tile === KEY_TILE) {
         map[cy][cx] = 0; // Remove the key from the map
         keysCollected++;
         if (keysCollected >= totalKeysInRoom) {
             unlockBlocks(); // Open the doors!
         }
     }
+    else if (tile === ESCORT_KEY_TILE && !hasEscortKey) {
+        map[cy][cx] = 0;
+        hasEscortKey = true;
+    }
+    else if (tile === ESCORT_LOCK_TILE && hasEscortKey) {
+        map[cy][cx] = 0;
+        hasEscortKey = false;
+        unlockBlocks();
+    }
+    else if (tile === PORTAL_TILE) {
+        return tryUsePortal(cx, cy);
+    }
+
+    return false;
 }
 
 function swapPhantomBlocks() {
@@ -551,11 +739,61 @@ function swapPhantomBlocks() {
 function unlockBlocks() {
     for (let y = 0; y < map.length; y++) {
         for (let x = 0; x < map[y].length; x++) {
-            if (map[y][x] === 15) {
+            if (map[y][x] === LOCKED_BLOCK_TILE) {
                 map[y][x] = 0; // Turn the locked block into empty space
             }
         }
     }
+}
+
+function getPortalKey(x, y) {
+    return `${x},${y}`;
+}
+
+function refreshRoomPortals() {
+    activeRoomPortals = [];
+    let totalPortalCount = 0;
+
+    for (let y = 0; y < map.length; y++) {
+        for (let x = 0; x < map[y].length; x++) {
+            if (map[y][x] !== PORTAL_TILE) continue;
+            totalPortalCount++;
+            if (activeRoomPortals.length < 2) {
+                activeRoomPortals.push({ x, y });
+            }
+        }
+    }
+
+    if (totalPortalCount > 2) {
+        console.warn(`Room ${currentRoomX},${currentRoomY} has ${totalPortalCount} portals. Only the first two will be linked.`);
+    }
+}
+
+function getLinkedPortal(sourceX, sourceY) {
+    if (activeRoomPortals.length !== 2) return null;
+
+    const [firstPortal, secondPortal] = activeRoomPortals;
+    if (firstPortal.x === sourceX && firstPortal.y === sourceY) {
+        return secondPortal;
+    }
+    if (secondPortal.x === sourceX && secondPortal.y === sourceY) {
+        return firstPortal;
+    }
+
+    return null;
+}
+
+function tryUsePortal(cx, cy) {
+    const sourcePortalKey = getPortalKey(cx, cy);
+    if (lockedPortalKey === sourcePortalKey) return false;
+
+    const destination = getLinkedPortal(cx, cy);
+    if (!destination) return false;
+
+    player.x = destination.x * TILE_SIZE + (TILE_SIZE - player.width) / 2;
+    player.y = destination.y * TILE_SIZE + (TILE_SIZE - player.height) / 2;
+    lockedPortalKey = getPortalKey(destination.x, destination.y);
+    return true;
 }
 
 function getTileKey(x, y) {
@@ -661,29 +899,45 @@ function update() {
         }
     }
 
-    player.x += player.vx;
+    applyWindForces();
+
+    const horizontalVelocity = player.vx;
+    player.x += horizontalVelocity;
     if (dashJustExpired && isTouchingTile(player.x, player.y, DASH_THROUGH_TILE)) {
         die();
         return;
     }
     if (checkCollision(player.x, player.y)) {
+        const horizontalCollisionTile = getHorizontalCollisionTile(player.x, player.y, horizontalVelocity);
         if (player.vx > 0) player.x = Math.floor((player.x + player.width) / TILE_SIZE) * TILE_SIZE - player.width - 0.1;
         else if (player.vx < 0) player.x = Math.floor(player.x / TILE_SIZE) * TILE_SIZE + TILE_SIZE + 0.1;
-        player.vx = 0;
+
+        if (horizontalCollisionTile === BOUNCE_TILE) {
+            player.vx = getBounceVelocity(horizontalVelocity);
+        } else {
+            player.vx = 0;
+        }
     }
 
     let oldY = player.y; // Remember where we were before falling
-    player.y += player.vy;
+    const verticalVelocity = player.vy;
+    player.y += verticalVelocity;
     if (dashJustExpired && isTouchingTile(player.x, player.y, DASH_THROUGH_TILE)) {
         die();
         return;
     }
 
     if (checkCollision(player.x, player.y)) {
+        const verticalCollisionTile = getVerticalCollisionTile(player.x, player.y, verticalVelocity);
         // Standard solid wall/floor collision
         if (player.vy > 0) player.y = Math.floor((player.y + player.height) / TILE_SIZE) * TILE_SIZE - player.height - 0.1;
         else if (player.vy < 0) player.y = Math.floor(player.y / TILE_SIZE) * TILE_SIZE + TILE_SIZE + 0.1;
-        player.vy = 0;
+
+        if (verticalCollisionTile === BOUNCE_TILE) {
+            player.vy = getBounceVelocity(verticalVelocity);
+        } else {
+            player.vy = 0;
+        }
     } else if (player.vy > 0) { 
         // ONE-WAY PLATFORM LOGIC (Only check if we are falling down)
         let left = Math.floor(player.x / TILE_SIZE);
@@ -719,7 +973,9 @@ function update() {
     }
 
     checkHazards(player.x, player.y);
-    checkInteractions(player.x, player.y);
+    if (checkInteractions(player.x, player.y)) {
+        return;
+    }
     
     if (player.x > canvas.width) { if (!loadRoom(currentRoomX + 1, currentRoomY, 'left')) player.x = canvas.width - player.width; } 
     else if (player.x + player.width < 0) { if (!loadRoom(currentRoomX - 1, currentRoomY, 'right')) player.x = 0; }
@@ -834,7 +1090,7 @@ function draw() {
                 ctx.lineTo(x * TILE_SIZE + 8, y * TILE_SIZE + 24); 
                 ctx.fill(); 
             }
-            else if (tile === 14) { 
+            else if (tile === KEY_TILE) { 
                 // Key
                 ctx.fillStyle = "#FFD700"; // Gold
                 ctx.beginPath();
@@ -843,7 +1099,7 @@ function draw() {
                 ctx.fillRect(x * TILE_SIZE + 10, y * TILE_SIZE + 14, 14, 4); // Key shaft
                 ctx.fillRect(x * TILE_SIZE + 20, y * TILE_SIZE + 18, 4, 4); // Key tooth
             }
-            else if (tile === 15) { 
+            else if (tile === LOCKED_BLOCK_TILE) { 
                 // Locked Block
                 ctx.fillStyle = "#5c3a21"; // Dark wood
                 ctx.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
@@ -860,20 +1116,138 @@ function draw() {
                 ctx.fill();
                 ctx.fillRect(x * TILE_SIZE + 15, y * TILE_SIZE + 15, 2, 4);
             }
+            else if (tile === ESCORT_KEY_TILE) {
+                ctx.fillStyle = "#ff9f1c";
+                ctx.beginPath();
+                ctx.arc(x * TILE_SIZE + 10, y * TILE_SIZE + 16, 6, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillRect(x * TILE_SIZE + 10, y * TILE_SIZE + 14, 14, 4);
+                ctx.fillRect(x * TILE_SIZE + 20, y * TILE_SIZE + 18, 4, 4);
+
+                ctx.fillStyle = "#0fd3ff";
+                ctx.fillRect(x * TILE_SIZE + 5, y * TILE_SIZE + 14, 4, 4);
+                ctx.fillRect(x * TILE_SIZE + 14, y * TILE_SIZE + 12, 5, 2);
+            }
+            else if (tile === ESCORT_LOCK_TILE) {
+                const left = x * TILE_SIZE;
+                const top = y * TILE_SIZE;
+
+                ctx.fillStyle = "#24465a";
+                ctx.fillRect(left + 10, top + 12, 12, 18);
+
+                ctx.fillStyle = "#17303d";
+                ctx.fillRect(left + 7, top + 6, 18, 14);
+
+                ctx.strokeStyle = "#0fd3ff";
+                ctx.lineWidth = 2;
+                ctx.strokeRect(left + 7, top + 6, 18, 14);
+
+                ctx.fillStyle = "#ff9f1c";
+                ctx.fillRect(left + 11, top + 10, 10, 8);
+
+                ctx.fillStyle = "#0fd3ff";
+                ctx.beginPath();
+                ctx.arc(left + 16, top + 13, 2, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillRect(left + 15, top + 13, 2, 5);
+            }
+            else if (tile === PORTAL_TILE) {
+                const left = x * TILE_SIZE;
+                const top = y * TILE_SIZE;
+
+                ctx.fillStyle = "#14162b";
+                ctx.beginPath();
+                ctx.arc(left + 16, top + 16, 11, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.strokeStyle = "#74f7ff";
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(left + 16, top + 16, 11, 0, Math.PI * 2);
+                ctx.stroke();
+
+                ctx.fillStyle = "#090b16";
+                ctx.beginPath();
+                ctx.arc(left + 16, top + 16, 6, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            else if (tile === BOUNCE_TILE) {
+                const left = x * TILE_SIZE;
+                const top = y * TILE_SIZE;
+
+                ctx.fillStyle = "#ff4fa3";
+                ctx.fillRect(left, top, TILE_SIZE, TILE_SIZE);
+
+                ctx.strokeStyle = "#c81b74";
+                ctx.lineWidth = 2;
+                ctx.strokeRect(left + 1, top + 1, TILE_SIZE - 2, TILE_SIZE - 2);
+            }
+            else if (isWindTile(tile)) {
+                const left = x * TILE_SIZE;
+                const top = y * TILE_SIZE;
+                const direction = getWindDirection(tile);
+
+                ctx.fillStyle = "#2f4658";
+                ctx.fillRect(left, top, TILE_SIZE, TILE_SIZE);
+
+                ctx.strokeStyle = "#8fe8ff";
+                ctx.lineWidth = 2;
+                ctx.strokeRect(left + 1, top + 1, TILE_SIZE - 2, TILE_SIZE - 2);
+
+                ctx.fillStyle = "#8fe8ff";
+                ctx.beginPath();
+                if (direction.dx < 0) {
+                    ctx.moveTo(left + 8, top + 16);
+                    ctx.lineTo(left + 22, top + 9);
+                    ctx.lineTo(left + 22, top + 23);
+                } else if (direction.dx > 0) {
+                    ctx.moveTo(left + 24, top + 16);
+                    ctx.lineTo(left + 10, top + 9);
+                    ctx.lineTo(left + 10, top + 23);
+                } else if (direction.dy < 0) {
+                    ctx.moveTo(left + 16, top + 8);
+                    ctx.lineTo(left + 9, top + 22);
+                    ctx.lineTo(left + 23, top + 22);
+                } else {
+                    ctx.moveTo(left + 16, top + 24);
+                    ctx.lineTo(left + 9, top + 10);
+                    ctx.lineTo(left + 23, top + 10);
+                }
+                ctx.fill();
+
+                if (direction.dx < 0) {
+                    ctx.fillRect(left + 23, top + 9, 3, 3);
+                    ctx.fillRect(left + 23, top + 15, 5, 3);
+                    ctx.fillRect(left + 23, top + 21, 3, 3);
+                } else if (direction.dx > 0) {
+                    ctx.fillRect(left + 6, top + 9, 3, 3);
+                    ctx.fillRect(left + 4, top + 15, 5, 3);
+                    ctx.fillRect(left + 6, top + 21, 3, 3);
+                } else if (direction.dy < 0) {
+                    ctx.fillRect(left + 9, top + 23, 3, 3);
+                    ctx.fillRect(left + 15, top + 23, 3, 5);
+                    ctx.fillRect(left + 21, top + 23, 3, 3);
+                } else {
+                    ctx.fillRect(left + 9, top + 6, 3, 3);
+                    ctx.fillRect(left + 15, top + 4, 3, 5);
+                    ctx.fillRect(left + 21, top + 6, 3, 3);
+                }
+            }
         }
 
-        if (activeSignText) {
-        // Draw a dark background box for readability
+    }
+
+    drawWindBeamEffects();
+
+    if (activeSignText) {
         ctx.fillStyle = "rgba(0, 0, 0, 0.75)";
         ctx.fillRect(canvas.width / 2 - 200, canvas.height - 40, 400, 30);
-        
-        // Draw the text
+
         ctx.fillStyle = "white";
         ctx.font = "16px sans-serif";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillText(activeSignText, canvas.width / 2, canvas.height - 25);
-    }
     }
 
     ctx.fillStyle = player.hasDash ? "#ff3366" : "#00ccff"; 
@@ -883,6 +1257,21 @@ function draw() {
         let size = Math.min(player.potions * 6, player.width - 4); 
         ctx.fillStyle = "#00ff88"; 
         ctx.fillRect(player.x + (player.width / 2) - (size / 2), player.y + (player.height / 2) - (size / 2), size, size);
+    }
+
+    if (hasEscortKey) {
+        const keyX = player.x + player.width - 8;
+        const keyY = player.y - 8;
+
+        ctx.fillStyle = "#ff9f1c";
+        ctx.beginPath();
+        ctx.arc(keyX, keyY, 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillRect(keyX, keyY - 1.5, 10, 3);
+        ctx.fillRect(keyX + 7, keyY + 1.5, 3, 3);
+
+        ctx.fillStyle = "#0fd3ff";
+        ctx.fillRect(keyX - 2, keyY - 1.5, 2, 3);
     }
 }
 
@@ -967,6 +1356,8 @@ function loadStage(stageIndex) {
     currentStageIndex = stageIndex;
     activeCheckpoint = null;
     activeSignText = null;
+    hasEscortKey = false;
+    lockedPortalKey = null;
     loadRoom(0, 0, 'spawn');
 }
 
@@ -1005,6 +1396,9 @@ function endGameplay(completed = false) {
     activeTimerRecordKey = null;
     isWholeGameRun = false;
     gameState = "menu";
+    hasEscortKey = false;
+    activeRoomPortals = [];
+    lockedPortalKey = null;
     uiLayer.style.display = "flex";
     hudLevelName.classList.add("hidden"); 
     timeTooltip.classList.add("hidden");

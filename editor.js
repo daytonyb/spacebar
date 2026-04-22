@@ -32,7 +32,15 @@ const tiles = [
     { id: 15, name: "Locked Block", color: "#5c3a21" },
     { id: 16, name: "Crumble Plat", color: "#c29157" },
     { id: 17, name: "Dash-Through", color: "#8a8a8a" },
-    { id: 18, name: "Dash Drain", color: "#666" }
+    { id: 18, name: "Dash Drain", color: "#666" },
+    { id: 19, name: "Escort Key", color: "#ff9f1c" },
+    { id: 20, name: "Escort Lock", color: "#24465a" },
+    { id: 21, name: "Portal (max 2/room)", color: "#74f7ff" },
+    { id: 22, name: "Bouncy Block", color: "#ff4fa3" },
+    { id: 23, name: "Wind Left", color: "#2f4658" },
+    { id: 24, name: "Wind Right", color: "#2f4658" },
+    { id: 25, name: "Wind Up", color: "#2f4658" },
+    { id: 26, name: "Wind Down", color: "#2f4658" }
 ];
 
 // --- SETUP PALETTE ---
@@ -115,6 +123,117 @@ function draw() {
             else if (tile === 18) { 
                 ctx.fillStyle = "#666"; ctx.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
                 ctx.fillStyle = "#00ccff"; ctx.beginPath(); ctx.arc(x * TILE_SIZE + 16, y * TILE_SIZE + 16, 4, 0, Math.PI * 2); ctx.fill();
+            }
+            else if (tile === 19) {
+                ctx.fillStyle = "#ff9f1c";
+                ctx.beginPath();
+                ctx.arc(x * TILE_SIZE + 10, y * TILE_SIZE + 16, 6, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillRect(x * TILE_SIZE + 10, y * TILE_SIZE + 14, 14, 4);
+                ctx.fillRect(x * TILE_SIZE + 20, y * TILE_SIZE + 18, 4, 4);
+                ctx.fillStyle = "#0fd3ff";
+                ctx.fillRect(x * TILE_SIZE + 5, y * TILE_SIZE + 14, 4, 4);
+                ctx.fillRect(x * TILE_SIZE + 14, y * TILE_SIZE + 12, 5, 2);
+            }
+            else if (tile === 20) {
+                const left = x * TILE_SIZE;
+                const top = y * TILE_SIZE;
+                ctx.fillStyle = "#24465a";
+                ctx.fillRect(left + 10, top + 12, 12, 18);
+                ctx.fillStyle = "#17303d";
+                ctx.fillRect(left + 7, top + 6, 18, 14);
+                ctx.strokeStyle = "#0fd3ff";
+                ctx.lineWidth = 2;
+                ctx.strokeRect(left + 7, top + 6, 18, 14);
+                ctx.fillStyle = "#ff9f1c";
+                ctx.fillRect(left + 11, top + 10, 10, 8);
+                ctx.fillStyle = "#0fd3ff";
+                ctx.beginPath();
+                ctx.arc(left + 16, top + 13, 2, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillRect(left + 15, top + 13, 2, 5);
+            }
+            else if (tile === 21) {
+                const left = x * TILE_SIZE;
+                const top = y * TILE_SIZE;
+                ctx.fillStyle = "#14162b";
+                ctx.beginPath();
+                ctx.arc(left + 16, top + 16, 11, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = "#74f7ff";
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(left + 16, top + 16, 11, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.fillStyle = "#090b16";
+                ctx.beginPath();
+                ctx.arc(left + 16, top + 16, 6, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            else if (tile === 22) {
+                const left = x * TILE_SIZE;
+                const top = y * TILE_SIZE;
+                ctx.fillStyle = "#ff4fa3";
+                ctx.fillRect(left, top, TILE_SIZE, TILE_SIZE);
+                ctx.strokeStyle = "#c81b74";
+                ctx.lineWidth = 2;
+                ctx.strokeRect(left + 1, top + 1, TILE_SIZE - 2, TILE_SIZE - 2);
+            }
+            else if (tile >= 23 && tile <= 26) {
+                const left = x * TILE_SIZE;
+                const top = y * TILE_SIZE;
+                const direction = tile === 23
+                    ? { dx: -1, dy: 0 }
+                    : tile === 24
+                        ? { dx: 1, dy: 0 }
+                        : tile === 25
+                            ? { dx: 0, dy: -1 }
+                            : { dx: 0, dy: 1 };
+
+                ctx.fillStyle = "#2f4658";
+                ctx.fillRect(left, top, TILE_SIZE, TILE_SIZE);
+                ctx.strokeStyle = "#8fe8ff";
+                ctx.lineWidth = 2;
+                ctx.strokeRect(left + 1, top + 1, TILE_SIZE - 2, TILE_SIZE - 2);
+
+                ctx.fillStyle = "#8fe8ff";
+                ctx.beginPath();
+                if (direction.dx < 0) {
+                    ctx.moveTo(left + 8, top + 16);
+                    ctx.lineTo(left + 22, top + 9);
+                    ctx.lineTo(left + 22, top + 23);
+                } else if (direction.dx > 0) {
+                    ctx.moveTo(left + 24, top + 16);
+                    ctx.lineTo(left + 10, top + 9);
+                    ctx.lineTo(left + 10, top + 23);
+                } else if (direction.dy < 0) {
+                    ctx.moveTo(left + 16, top + 8);
+                    ctx.lineTo(left + 9, top + 22);
+                    ctx.lineTo(left + 23, top + 22);
+                } else {
+                    ctx.moveTo(left + 16, top + 24);
+                    ctx.lineTo(left + 9, top + 10);
+                    ctx.lineTo(left + 23, top + 10);
+                }
+                ctx.fill();
+
+                if (direction.dx < 0) {
+                    ctx.fillRect(left + 23, top + 9, 3, 3);
+                    ctx.fillRect(left + 23, top + 15, 5, 3);
+                    ctx.fillRect(left + 23, top + 21, 3, 3);
+                } else if (direction.dx > 0) {
+                    ctx.fillRect(left + 6, top + 9, 3, 3);
+                    ctx.fillRect(left + 4, top + 15, 5, 3);
+                    ctx.fillRect(left + 6, top + 21, 3, 3);
+                } else if (direction.dy < 0) {
+                    ctx.fillRect(left + 9, top + 23, 3, 3);
+                    ctx.fillRect(left + 15, top + 23, 3, 5);
+                    ctx.fillRect(left + 21, top + 23, 3, 3);
+                } else {
+                    ctx.fillRect(left + 9, top + 6, 3, 3);
+                    ctx.fillRect(left + 15, top + 4, 3, 5);
+                    ctx.fillRect(left + 21, top + 6, 3, 3);
+                }
             }
         }
     }
