@@ -1181,9 +1181,6 @@ function update() {
     let dashJustExpired = false;
     if (player.isDashing) {
         
-        // --- NEW: CELESTE-STYLE DASH GRACE PERIOD ---
-        // Allow the player to correct their dash direction within the first 3 frames 
-        // in case they pressed Dash slightly before their directional key.
         if (player.dashTimer >= player.dashDuration - 3) {
             let dx = 0, dy = 0;
             if (keys.right) dx += 1;
