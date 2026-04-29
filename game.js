@@ -416,16 +416,40 @@ const stages = [
   [1,9,9,9,9,9,9,9,9,1,1,1,1,1,1,9,9,9,9,1]
 ],
 "4,1": [
+  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+  [1,0,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+  [1,16,16,16,0,0,0,2,0,0,0,2,0,0,0,2,0,0,0,1],
+  [1,0,0,0,0,0,16,16,16,0,0,0,0,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,1],
+  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+  [1,0,0,0,0,2,0,0,0,0,0,0,0,2,0,0,0,2,0,1],
+  [0,0,0,0,16,16,16,0,0,19,0,0,16,16,16,0,0,0,0,1],
+  [0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+  [1,1,1,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,1]
+],
+"4,0": [
+  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,15,15,1],
+  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,21,0,0,7,1],
+  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,1],
+  [1,20,0,2,0,2,0,0,0,2,0,0,0,2,0,0,0,0,0,1],
+  [1,16,16,16,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,1],
+  [1,0,0,0,0,2,0,0,0,7,0,0,0,0,0,0,0,2,0,1],
+  [1,0,0,0,0,0,0,0,0,0,0,0,0,21,0,0,0,17,17,1],
+  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+  [1,0,2,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,1],
+  [1,16,16,16,0,0,0,0,0,0,16,0,0,0,0,0,0,0,16,1]
+],
+"4,-1": [
   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [0,11,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,11,0,4,1],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,10,10,1]
 ],
         },
         roomNames: {},
@@ -435,7 +459,7 @@ const stages = [
 "2,0": "Escort keys can be brought through rooms with you",
 "2,-3": "Portals will teleport you to the other portal in the room",
 "1,-3": "Portals will carry your momentum through them!",
-"4,1": "Coming Soon!"
+"4,-1": "Coming Soon!"
         }
     },
 ];
@@ -947,11 +971,14 @@ function drawWindBeamEffects() {
 }
 
 function checkHazards(px, py) {
-    let margin = 4;
-    let left = Math.floor((px + margin) / TILE_SIZE);
-    let right = Math.floor((px + player.width - margin) / TILE_SIZE);
-    let top = Math.floor((py + margin) / TILE_SIZE);
-    let bottom = Math.floor((py + player.height - margin) / TILE_SIZE);
+    // INCREASE THESE MARGINS to make spikes much more forgiving
+    let marginX = 8; // Shaves 8px off the left and right (16px total)
+    let marginY = 8; // Shaves 8px off the top and bottom 
+
+    let left = Math.floor((px + marginX) / TILE_SIZE);
+    let right = Math.floor((px + player.width - marginX) / TILE_SIZE);
+    let top = Math.floor((py + marginY) / TILE_SIZE);
+    let bottom = Math.floor((py + player.height - marginY) / TILE_SIZE);
 
     for (let y = top; y <= bottom; y++) {
         for (let x = left; x <= right; x++) {
@@ -1153,6 +1180,26 @@ function update() {
 
     let dashJustExpired = false;
     if (player.isDashing) {
+        
+        // --- NEW: CELESTE-STYLE DASH GRACE PERIOD ---
+        // Allow the player to correct their dash direction within the first 3 frames 
+        // in case they pressed Dash slightly before their directional key.
+        if (player.dashTimer >= player.dashDuration - 3) {
+            let dx = 0, dy = 0;
+            if (keys.right) dx += 1;
+            if (keys.left) dx -= 1;
+            if (keys.down) dy += 1;
+            if (keys.up) dy -= 1;
+
+            // If they are pressing a direction, override the current dash velocity
+            if (dx !== 0 || dy !== 0) {
+                let length = Math.sqrt(dx * dx + dy * dy);
+                player.vx = (dx / length) * player.dashSpeed;
+                player.vy = (dy / length) * player.dashSpeed;
+            }
+        }
+        // --------------------------------------------
+
         player.dashTimer--;
         if (player.dashTimer <= 0) {
             player.isDashing = false;
