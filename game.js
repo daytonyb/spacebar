@@ -70,7 +70,7 @@ const stages = [
             "1,0": [[1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1],[0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1],[4,0,11,0,0,0,0,7,1,0,0,0,0,0,0,0,0,0,0,1],[1,1,1,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[1,0,0,0,0,0,0,0,0,0,0,0,0,7,0,0,0,0,0,0],[1,0,0,0,0,0,1,1,1,0,0,0,1,1,1,0,0,0,1,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,1]],
             "1,-1": [[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,14,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,1,1,1,1,0,0,0,0,0,0,1,1,15,15,1],[1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,1,0,0,0],[1,0,4,0,0,11,0,0,1,0,0,0,0,0,0,1,1,0,0,0],[1,1,1,1,1,1,10,10,1,9,9,9,9,9,9,1,1,1,1,1]],
             "2,0": [[1,2,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],[1,1,0,0,0,0,0,5,0,0,0,6,0,0,0,0,0,0,0,1],[1,1,0,2,0,0,0,5,0,2,0,6,0,2,0,0,0,0,0,1],[1,1,1,1,1,5,5,5,1,1,1,6,1,1,1,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,1],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1],[0,4,0,11,0,0,2,0,0,2,0,0,0,0,0,0,0,0,0,1],[1,1,1,1,1,5,5,5,6,6,6,1,1,1,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,1]],
-            "2,-1": [[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,1],[1,7,0,0,0,0,0,0,0,0,15,0,0,0,0,0,0,0,0,1],[1,5,5,0,0,0,0,14,0,0,15,0,0,0,0,0,0,0,7,1],[1,2,0,0,0,0,0,0,0,0,15,0,0,0,0,0,0,1,1,1],[1,6,6,0,0,0,0,0,0,0,15,0,0,0,0,2,0,0,0,1],[1,2,0,0,0,0,0,0,0,0,15,0,0,2,0,0,0,0,0,1],[1,10,10,1,0,0,0,0,0,0,15,0,0,0,0,0,0,0,0,1],[0,0,0,1,0,0,0,0,0,0,15,0,2,0,0,0,0,0,0,1],[0,4,0,1,0,0,0,0,0,0,15,1,1,1,0,0,0,0,0,1],[1,10,10,1,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,1]],
+            "2,-1": [[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,1],[1,7,0,0,0,0,0,0,0,0,15,0,0,0,0,0,0,0,0,1],[1,5,5,0,0,0,0,14,0,0,15,0,0,0,0,0,0,0,7,1],[1,0,0,2,0,0,0,0,0,0,15,0,0,0,0,0,0,1,1,1],[1,6,6,0,0,0,0,0,0,0,15,0,0,0,0,2,0,0,0,1],[1,2,0,0,0,0,0,0,0,0,15,0,0,2,0,0,0,0,0,1],[1,10,10,1,0,0,0,0,0,0,15,0,0,0,0,0,0,0,0,1],[0,0,0,1,0,0,0,0,0,0,15,0,2,0,0,0,0,0,0,1],[0,4,0,1,0,0,0,0,0,0,15,1,1,1,0,0,0,0,0,1],[1,10,10,1,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,1]],
             "2,-2": [[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,1,1,1],[1,0,0,0,0,0,0,0,0,0,2,0,0,1,1,1,0,0,0,1],[1,0,0,0,0,0,2,0,0,1,1,1,0,0,0,0,0,0,0,1],[1,0,2,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0],[1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[1,0,0,0,0,0,0,0,0,0,4,0,0,0,11,0,0,0,0,1],[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,10,10,1]],
             "3,-2": [[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],[1,0,0,0,0,2,0,0,0,0,0,0,0,0,0,2,14,0,0,1],[1,0,0,0,0,6,0,0,0,0,2,0,0,0,0,6,6,0,0,1],[1,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,5,5,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,0,0,0,1],[0,0,0,0,0,0,0,0,0,0,0,2,14,0,0,0,0,0,0,1],[0,4,0,11,0,0,0,0,0,0,0,5,5,0,0,0,0,0,0,1],[1,5,5,5,15,15,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,9,9,9,0,0,9,9,9,9,9,9,9,9,9,9,9,9,9,1]],
             "3,-1": [[1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1],[1,0,0,0,4,0,0,0,0,0,0,0,7,0,0,0,0,0,1,1],[1,0,0,0,1,1,0,0,0,0,2,0,0,0,0,0,0,2,1,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,15,0],[1,0,0,0,0,0,0,0,7,0,14,0,0,0,0,0,0,0,15,0],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1],[1,0,0,0,0,0,0,0,0,2,0,0,2,0,0,0,1,1,1,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1],[1,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,1,1,1,1]],
@@ -493,6 +493,10 @@ const player = {
     potions: 0, facing: 1, hasDash: true, isDashing: false, dashTimer: 0, dashDuration: 12, dashSpeed: 10
 };
 
+let deathParticles = [];
+let deathTimer = 0;
+const DEATH_DURATION = 30; // How many frames the animation lasts (0.5 seconds)
+
 // --- KEYBINDINGS ---
 const defaultBinds = { up: "ArrowUp", down: "ArrowDown", left: "ArrowLeft", right: "ArrowRight", jump: "Space", dash: "ShiftLeft" };
 let userBinds = JSON.parse(localStorage.getItem("spacebarBinds")) || { ...defaultBinds };
@@ -762,10 +766,26 @@ function loadRoom(rx, ry, entrance = 'spawn') {
 }
 
 function die() {
+    if (gameState === "dying") return; // Prevent dying multiple times at once
+    
     recordDeath();
     hasEscortKey = false; // Drop the escort key on death
-    if (activeCheckpoint) loadRoom(activeCheckpoint.rx, activeCheckpoint.ry, 'checkpoint');
-    else loadRoom(0, 0, 'spawn');
+    gameState = "dying";
+    deathTimer = DEATH_DURATION;
+    
+    // Spawn 8 expanding orbs in a circle
+    deathParticles = [];
+    for (let i = 0; i < 8; i++) {
+        let angle = (i / 8) * Math.PI * 2;
+        let speed = 6;
+        deathParticles.push({
+            x: player.x + player.width / 2,
+            y: player.y + player.height / 2,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            radius: 8
+        });
+    }
 }
 
 function startDash() {
@@ -988,47 +1008,79 @@ function checkHazards(px, py) {
 }
 
 function checkInteractions(px, py) {
+    // 1. Center-based interactions (Doors, Portals, Signs, Checkpoints, Locks!)
     let cx = Math.floor((px + player.width / 2) / TILE_SIZE);
     let cy = Math.floor((py + player.height / 2) / TILE_SIZE);
-    if (!map[cy]) return false;
-    let tile = map[cy][cx];
+    
+    if (map[cy]) {
+        let centerTile = map[cy][cx];
+        activeSignText = null;
+        if (centerTile !== PORTAL_TILE) lockedPortalKey = null;
 
-    activeSignText = null;
-    if (tile !== PORTAL_TILE) lockedPortalKey = null;
-
-    // CHECK FOR SIGNS (The simple version!)
-    if (tile === 11) {
-        const currentStage = stages[currentStageIndex];
-        const roomKey = `${currentRoomX},${currentRoomY}`;
+        if (centerTile === 11) {
+            const currentStage = stages[currentStageIndex];
+            const roomKey = `${currentRoomX},${currentRoomY}`;
+            if (currentStage.signs && currentStage.signs[roomKey]) {
+                activeSignText = currentStage.signs[roomKey];
+            }
+        }
+        else if (centerTile === 4) activeCheckpoint = { rx: currentRoomX, ry: currentRoomY, px: cx * TILE_SIZE + 4, py: cy * TILE_SIZE + 4, cx, cy };
+        else if (centerTile === 8) { finishStage(); return true; }
+        else if (centerTile === PORTAL_TILE) { return tryUsePortal(cx, cy); }
         
-        // Just check if the current room has a sign message, and display it!
-        if (currentStage.signs && currentStage.signs[roomKey]) {
-            activeSignText = currentStage.signs[roomKey];
+        // FIX: Escort Locks are center-based interactions, not magnetized collectibles!
+        else if (centerTile === ESCORT_LOCK_TILE && hasEscortKey) {
+            map[cy][cx] = 0;
+            hasEscortKey = false;
+            unlockBlocks();
         }
     }
 
-    if (tile === 2) { map[cy][cx] = 0; player.potions++; }
-    else if (tile === 7 && !player.hasDash) { map[cy][cx] = 0; player.hasDash = true; }
-    else if (tile === 4) activeCheckpoint = { rx: currentRoomX, ry: currentRoomY, px: cx * TILE_SIZE + 4, py: cy * TILE_SIZE + 4, cx, cy };
-    else if (tile === 8) { finishStage(); return true; }
-    else if (tile === KEY_TILE) {
-        map[cy][cx] = 0; // Remove the key from the map
-        keysCollected++;
-        if (keysCollected >= totalKeysInRoom) {
-            unlockBlocks(); // Open the doors!
+    // 2. TRUE MAGNETIZED COLLECTIBLES (AABB Sprite Collision)
+    let scanMargin = 16; 
+    let left = Math.floor((px - scanMargin) / TILE_SIZE);
+    let right = Math.floor((px + player.width + scanMargin) / TILE_SIZE);
+    let top = Math.floor((py - scanMargin) / TILE_SIZE);
+    let bottom = Math.floor((py + player.height + scanMargin) / TILE_SIZE);
+
+    for (let y = top; y <= bottom; y++) {
+        for (let x = left; x <= right; x++) {
+            if (!map[y] || x < 0 || x >= 20) continue;
+            let tile = map[y][x];
+
+            // If it's a collectible, do a pixel-perfect check against its actual sprite
+            if (tile === 2 || tile === 7 || tile === KEY_TILE || tile === ESCORT_KEY_TILE) {
+                
+                // The actual visual box of the item (16x16 in the center of the 32x32 tile)
+                let itemX = x * TILE_SIZE + 8;
+                let itemY = y * TILE_SIZE + 8;
+                let itemW = 16;
+                let itemH = 16;
+
+                // The player's box, expanded by the magnet reach
+                let reach = 2; 
+                let pX = px - reach;
+                let pY = py - reach;
+                let pW = player.width + (reach * 2);
+                let pH = player.height + (reach * 2);
+
+                // True AABB Collision check
+                if (pX < itemX + itemW && pX + pW > itemX && pY < itemY + itemH && pY + pH > itemY) {
+                    // Collect it!
+                    if (tile === 2) { map[y][x] = 0; player.potions++; }
+                    else if (tile === 7 && !player.hasDash) { map[y][x] = 0; player.hasDash = true; }
+                    else if (tile === KEY_TILE) {
+                        map[y][x] = 0;
+                        keysCollected++;
+                        if (keysCollected >= totalKeysInRoom) unlockBlocks();
+                    }
+                    else if (tile === ESCORT_KEY_TILE && !hasEscortKey) {
+                        map[y][x] = 0;
+                        hasEscortKey = true;
+                    }
+                }
+            }
         }
-    }
-    else if (tile === ESCORT_KEY_TILE && !hasEscortKey) {
-        map[cy][cx] = 0;
-        hasEscortKey = true;
-    }
-    else if (tile === ESCORT_LOCK_TILE && hasEscortKey) {
-        map[cy][cx] = 0;
-        hasEscortKey = false;
-        unlockBlocks();
-    }
-    else if (tile === PORTAL_TILE) {
-        return tryUsePortal(cx, cy);
     }
 
     return false;
@@ -1178,9 +1230,31 @@ function update() {
         hudTimer.innerText = formatTime(elapsed);
     }
 
+    // --- NEW: DEATH ANIMATION LOGIC ---
+    if (gameState === "dying") {
+        deathTimer--;
+        
+        // Move and shrink particles
+        deathParticles.forEach(p => {
+            p.x += p.vx;
+            p.y += p.vy;
+            p.vx *= 0.85; // Friction so they slow down
+            p.vy *= 0.85;
+            p.radius *= 0.9; // Shrink over time
+        });
+
+        // When the timer is up, actually reset the room
+        if (deathTimer <= 0) {
+            gameState = "playing";
+            if (activeCheckpoint) loadRoom(activeCheckpoint.rx, activeCheckpoint.ry, 'checkpoint');
+            else loadRoom(0, 0, 'spawn');
+        }
+        return; // Don't run any other physics!
+    }
+
     let dashJustExpired = false;
     if (player.isDashing) {
-        
+        // Allow the player to correct their dash direction within the first 3 frames 
         if (player.dashTimer >= player.dashDuration - 3) {
             let dx = 0, dy = 0;
             if (keys.right) dx += 1;
@@ -1195,7 +1269,7 @@ function update() {
                 player.vy = (dy / length) * player.dashSpeed;
             }
         }
-        // --------------------------------------------
+        // ---------------------------------------
 
         player.dashTimer--;
         if (player.dashTimer <= 0) {
@@ -1254,14 +1328,38 @@ function update() {
 
     if (checkCollision(player.x, player.y)) {
         const verticalCollisionTile = getVerticalCollisionTile(player.x, player.y, verticalVelocity);
-        // Standard solid wall/floor collision
-        if (player.vy > 0) player.y = Math.floor((player.y + player.height) / TILE_SIZE) * TILE_SIZE - player.height - 0.1;
-        else if (player.vy < 0) player.y = Math.floor(player.y / TILE_SIZE) * TILE_SIZE + TILE_SIZE + 0.1;
+        
+        // --- CELESTE-STYLE CORNER CORRECTION ---
+        let cornerCorrected = false;
+        
+        // Only trigger if we are moving UPWARDS (hitting our head on a ceiling)
+        if (player.vy < 0) { 
+            let nudgeAmount = 5; // How many pixels we allow the game to shift the player
+            
+            // Check if sliding to the RIGHT slightly clears the collision
+            if (!checkCollision(player.x + nudgeAmount, player.y)) {
+                player.x += nudgeAmount; // Teleport them right
+                cornerCorrected = true;  // Prevent Y-velocity from being killed
+            } 
+            // Check if sliding to the LEFT slightly clears the collision
+            else if (!checkCollision(player.x - nudgeAmount, player.y)) {
+                player.x -= nudgeAmount; // Teleport them left
+                cornerCorrected = true;  // Prevent Y-velocity from being killed
+            }
+        }
+        // ----------------------------------------
 
-        if (verticalCollisionTile === BOUNCE_TILE) {
-            player.vy = getBounceVelocity(verticalVelocity);
-        } else {
-            player.vy = 0;
+        // If we didn't magically corner correct them, handle the collision normally
+        if (!cornerCorrected) {
+            // Standard solid wall/floor collision
+            if (player.vy > 0) player.y = Math.floor((player.y + player.height) / TILE_SIZE) * TILE_SIZE - player.height - 0.1;
+            else if (player.vy < 0) player.y = Math.floor(player.y / TILE_SIZE) * TILE_SIZE + TILE_SIZE + 0.1;
+
+            if (verticalCollisionTile === BOUNCE_TILE) {
+                player.vy = getBounceVelocity(verticalVelocity);
+            } else {
+                player.vy = 0;
+            }
         }
     } else if (player.vy > 0) { 
         // ONE-WAY PLATFORM LOGIC (Only check if we are falling down)
@@ -1575,28 +1673,43 @@ function draw() {
         ctx.fillText(activeSignText, canvas.width / 2, canvas.height - 25);
     }
 
-    ctx.fillStyle = player.hasDash ? "#ff3366" : "#00ccff"; 
-    ctx.fillRect(player.x, player.y, player.width, player.height);
+// Replace the bottom of your draw() function with this:
+    
+    if (gameState === "dying") {
+        // Draw the exploding particles
+        ctx.fillStyle = player.hasDash ? "#ff3366" : "#00ccff"; // Match the player's current color
+        deathParticles.forEach(p => {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+            ctx.fill();
+        });
+    } else {
+        // Draw the normal player
+        ctx.fillStyle = player.hasDash ? "#ff3366" : "#00ccff"; 
+        ctx.fillRect(player.x, player.y, player.width, player.height);
 
-    if (player.potions > 0) {
-        let size = Math.min(player.potions * 6, player.width - 4); 
-        ctx.fillStyle = "#00ff88"; 
-        ctx.fillRect(player.x + (player.width / 2) - (size / 2), player.y + (player.height / 2) - (size / 2), size, size);
-    }
+        // Draw double jump potions inside player
+        if (player.potions > 0) {
+            let size = Math.min(player.potions * 6, player.width - 4); 
+            ctx.fillStyle = "#00ff88"; 
+            ctx.fillRect(player.x + (player.width / 2) - (size / 2), player.y + (player.height / 2) - (size / 2), size, size);
+        }
 
-    if (hasEscortKey) {
-        const keyX = player.x + player.width - 8;
-        const keyY = player.y - 8;
+        // Draw Escort Key
+        if (hasEscortKey) {
+            const keyX = player.x + player.width - 8;
+            const keyY = player.y - 8;
 
-        ctx.fillStyle = "#ff9f1c";
-        ctx.beginPath();
-        ctx.arc(keyX, keyY, 4, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillRect(keyX, keyY - 1.5, 10, 3);
-        ctx.fillRect(keyX + 7, keyY + 1.5, 3, 3);
+            ctx.fillStyle = "#ff9f1c";
+            ctx.beginPath();
+            ctx.arc(keyX, keyY, 4, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillRect(keyX, keyY - 1.5, 10, 3);
+            ctx.fillRect(keyX + 7, keyY + 1.5, 3, 3);
 
-        ctx.fillStyle = "#0fd3ff";
-        ctx.fillRect(keyX - 2, keyY - 1.5, 2, 3);
+            ctx.fillStyle = "#0fd3ff";
+            ctx.fillRect(keyX - 2, keyY - 1.5, 2, 3);
+        }
     }
 }
 
@@ -1616,7 +1729,8 @@ function loop(timestamp) {
         deltaTime = 250;
     }
 
-    if (gameState === "playing") {
+    // --- CHANGE IS HERE ---
+    if (gameState === "playing" || gameState === "dying") {
         // Add the passed time to our accumulator
         accumulator += deltaTime;
 
