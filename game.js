@@ -1955,6 +1955,7 @@ stages.forEach((stage, index) => {
 document.getElementById("btnStartGame").onclick = () => showScreen("stageSelect");
 document.getElementById("btnSpeedrun").onclick = () => startGameplay(TUTORIAL_STAGE_INDEX, { wholeGameRun: true });
 document.getElementById("btnBestTimes").onclick = () => { renderBestTimes(); showScreen("bestTimes"); };
+document.getElementById("btnLegacyVersion").onclick = () => { window.location.href = "legacy.html"; };
 document.getElementById("btnStageBack").onclick = () => showScreen("main");
 document.getElementById("btnBestTimesBack").onclick = () => showScreen("main");
 document.getElementById("btnPauseResume").onclick = () => resumeGameplay();

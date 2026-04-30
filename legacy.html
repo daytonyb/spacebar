@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Where's My Spacebar?</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Where's My Spacebar Legacy Version</title>
+    <link rel="stylesheet" href="legacystyle.css">
 </head>
 <body>
     <div id="gameContainer">
@@ -19,19 +19,10 @@
 <div id="mainMenu" class="menu-screen">
     <h1>Where's My Spacebar?</h1>
     <button id="btnStartGame">Start Game</button>
-    <button id="btnSpeedrun">Speedrun</button>
-    <button id="btnBestTimes">Stats</button>
-    
-    <button id="btnLegacyVersion" style="background-color: #666; margin-top: 20px;">Legacy Version</button>
-</div>
+    <button id="btnSettings">Settings</button>
 
-            <div id="pauseMenu" class="menu-screen hidden">
-                <h1>Paused</h1>
-                <p class="menu-copy">Your run is paused and your time is safe.</p>
-                <button id="btnPauseResume">Resume</button>
-                <button id="btnPauseSettings">Settings</button>
-                <button id="btnPauseQuit">Quit Run</button>
-            </div>
+    <button id="btnModernVersion" style="background-color: #666; margin-top: 20px;">Current Version</button>
+</div>
 
             <div id="settingsMenu" class="menu-screen hidden">
                 <h1>Settings</h1>
@@ -46,9 +37,11 @@
                     
                     <div class="keybind-row" style="margin-top: 10px; border-top: 1px solid #555; padding-top: 10px;">
                         <span>Timer:</span> 
-                        <select id="timerVisibilitySelect" class="bind-btn select-btn">
-                            <option value="visible">Visible</option>
-                            <option value="hidden">Hidden</option>
+                        <select id="timerSelect" class="bind-btn select-btn">
+                            <option value="none">None</option>
+                            <option value="levels">Levels</option>
+                            <option value="stages">Stages</option>
+                            <option value="game">Whole Game</option>
                         </select>
                     </div>
                 </div>
@@ -66,14 +59,15 @@
                 <button id="btnStageBack" class="back-btn">Back</button>
             </div>
 
-            <div id="bestTimesMenu" class="menu-screen hidden">
-                <h1>Stats</h1>
-                <div id="bestTimesList" class="records-list"></div>
-                <button id="btnBestTimesBack" class="back-btn">Back</button>
+            <div id="levelSelectMenu" class="menu-screen hidden">
+                <h1 id="levelSelectTitle">Select Level</h1>
+                <div id="levelGrid" class="grid"></div>
+                <button id="btnLevelBack" class="back-btn">Back</button>
             </div>
+
         </div>
     </div>
     
-    <script src="game.js"></script>
+    <script src="legacygame.js"></script>
 </body>
 </html>
