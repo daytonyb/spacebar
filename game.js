@@ -505,6 +505,27 @@ const keys = { right: false, left: false, up: false, down: false };
 let jumpPressed = false; 
 let dashPressed = false;
 
+function resetGameplayInputs() {
+    keys.right = false;
+    keys.left = false;
+    keys.up = false;
+    keys.down = false;
+    jumpPressed = false;
+    dashPressed = false;
+}
+
+function clearPendingRebind() {
+    if (!rebindingAction) return;
+
+    const bindButton = document.getElementById(`bind-${rebindingAction}`);
+    if (bindButton) {
+        bindButton.classList.remove("waiting");
+        bindButton.innerText = userBinds[rebindingAction];
+    }
+
+    rebindingAction = null;
+}
+
 // --- TIMER FORMATTING & HOVER ---
 function formatTime(ms) {
     let totalSeconds = ms / 1000;
@@ -557,12 +578,12 @@ function recordDeath(stageIndex = currentStageIndex) {
 }
 
 function getVisibleBestTimeKey() {
-    if (gameState !== "playing") return null;
-    return isWholeGameRun ? "full_game" : getStageBestKey(currentStageIndex);
+    if (gameState !== "playing" && gameState !== "paused" && gameState !== "dying") return null;
+    return activeTimerRecordKey;
 }
 
 function refreshTimerVisibility() {
-    const shouldShowTimer = gameState === "playing" && isTimerVisible;
+    const shouldShowTimer = (gameState === "playing" || gameState === "paused" || gameState === "dying") && isTimerVisible;
     hudTimer.classList.toggle("hidden", !shouldShowTimer);
 
     if (!shouldShowTimer) {
@@ -574,6 +595,22 @@ function startTimer(recordKey) {
     activeTimerRecordKey = recordKey;
     startTime = performance.now();
     elapsed = 0;
+    isTimerRunning = true;
+    hudTimer.innerText = formatTime(elapsed);
+}
+
+function pauseTimer() {
+    if (!isTimerRunning) return;
+
+    elapsed = performance.now() - startTime;
+    isTimerRunning = false;
+    hudTimer.innerText = formatTime(elapsed);
+}
+
+function resumeTimer() {
+    if (isTimerRunning || !activeTimerRecordKey) return;
+
+    startTime = performance.now() - elapsed;
     isTimerRunning = true;
     hudTimer.innerText = formatTime(elapsed);
 }
@@ -672,6 +709,24 @@ window.addEventListener("keydown", (e) => {
         return;
     }
 
+    if (e.code === "Escape") {
+        if (gameState === "playing") {
+            e.preventDefault();
+            pauseGameplay();
+            return;
+        }
+
+        if (gameState === "paused") {
+            e.preventDefault();
+            if (activeScreen === "settings") {
+                showScreen("pause");
+            } else {
+                resumeGameplay();
+            }
+            return;
+        }
+    }
+
     if (gameState !== "playing") return;
     if (Object.values(userBinds).includes(e.code)) e.preventDefault();
 
@@ -679,8 +734,10 @@ window.addEventListener("keydown", (e) => {
     if (e.code === userBinds.left) { keys.left = true; player.facing = -1; }
     if (e.code === userBinds.up) keys.up = true;
     if (e.code === userBinds.down) keys.down = true;
-    if (e.code === "KeyR") die();
-    if (e.code === "Escape") endGameplay(false);
+    if (e.code === "KeyR") {
+        e.preventDefault();
+        die();
+    }
 
     if (e.code === userBinds.jump && !jumpPressed) {
         jumpPressed = true;
@@ -1749,8 +1806,11 @@ function loop(timestamp) {
 const uiLayer = document.getElementById("uiLayer");
 const stageGrid = document.getElementById("stageGrid");
 const bestTimesList = document.getElementById("bestTimesList");
+const pauseQuitButton = document.getElementById("btnPauseQuit");
+let activeScreen = "main";
 const menus = {
     main: document.getElementById("mainMenu"),
+    pause: document.getElementById("pauseMenu"),
     settings: document.getElementById("settingsMenu"),
     stageSelect: document.getElementById("stageSelectMenu"),
     bestTimes: document.getElementById("bestTimesMenu")
@@ -1759,7 +1819,37 @@ const menus = {
 function showScreen(screenName) {
     Object.values(menus).forEach(m => { if (m) m.classList.add("hidden"); });
     if (menus[screenName]) menus[screenName].classList.remove("hidden");
+    activeScreen = screenName;
     if (screenName === "stageSelect") refreshStageButtons();
+}
+
+function updatePauseQuitButtonLabel() {
+    pauseQuitButton.innerText = isWholeGameRun ? "Quit to Main Menu" : "Quit to Stage Select";
+}
+
+function pauseGameplay() {
+    if (gameState !== "playing") return;
+
+    pauseTimer();
+    gameState = "paused";
+    timeTooltip.classList.add("hidden");
+    refreshBindUI();
+    updatePauseQuitButtonLabel();
+    uiLayer.style.display = "flex";
+    uiLayer.classList.add("in-game-menu");
+    refreshTimerVisibility();
+    showScreen("pause");
+}
+
+function resumeGameplay() {
+    if (gameState !== "paused") return;
+
+    clearPendingRebind();
+    gameState = "playing";
+    uiLayer.style.display = "none";
+    uiLayer.classList.remove("in-game-menu");
+    resumeTimer();
+    refreshTimerVisibility();
 }
 
 function getSavedTimeLabel(key) {
@@ -1801,8 +1891,11 @@ function loadStage(stageIndex) {
 }
 
 function startGameplay(stageIndex, { wholeGameRun = false } = {}) {
+    clearPendingRebind();
+    resetGameplayInputs();
     gameState = "playing";
     uiLayer.style.display = "none";
+    uiLayer.classList.remove("in-game-menu");
     hudLevelName.classList.remove("hidden"); 
 
     isWholeGameRun = wholeGameRun;
@@ -1838,7 +1931,10 @@ function endGameplay(completed = false) {
     hasEscortKey = false;
     activeRoomPortals = [];
     lockedPortalKey = null;
+    clearPendingRebind();
+    resetGameplayInputs();
     uiLayer.style.display = "flex";
+    uiLayer.classList.remove("in-game-menu");
     hudLevelName.classList.add("hidden"); 
     timeTooltip.classList.add("hidden");
     refreshTimerVisibility();
@@ -1861,9 +1957,19 @@ document.getElementById("btnSpeedrun").onclick = () => startGameplay(TUTORIAL_ST
 document.getElementById("btnBestTimes").onclick = () => { renderBestTimes(); showScreen("bestTimes"); };
 document.getElementById("btnStageBack").onclick = () => showScreen("main");
 document.getElementById("btnBestTimesBack").onclick = () => showScreen("main");
-document.getElementById("btnSettings").onclick = () => { refreshBindUI(); showScreen("settings"); };
-document.getElementById("btnSettingsBack").onclick = () => { if (rebindingAction) document.getElementById(`bind-${rebindingAction}`).classList.remove("waiting"); rebindingAction = null; showScreen("main"); };
-document.getElementById("btnResetBinds").onclick = () => { userBinds = { ...defaultBinds }; localStorage.setItem("spacebarBinds", JSON.stringify(userBinds)); refreshBindUI(); };
+document.getElementById("btnPauseResume").onclick = () => resumeGameplay();
+document.getElementById("btnPauseSettings").onclick = () => { refreshBindUI(); showScreen("settings"); };
+document.getElementById("btnPauseQuit").onclick = () => endGameplay(false);
+document.getElementById("btnSettingsBack").onclick = () => {
+    clearPendingRebind();
+    showScreen(gameState === "paused" ? "pause" : "main");
+};
+document.getElementById("btnResetBinds").onclick = () => {
+    clearPendingRebind();
+    userBinds = { ...defaultBinds };
+    localStorage.setItem("spacebarBinds", JSON.stringify(userBinds));
+    refreshBindUI();
+};
 document.getElementById("btnResetData").onclick = () => { if (confirm("Erase all stats, progress, and controls?")) { localStorage.clear(); location.reload(); } };
 
 timerVisibilitySelect.onchange = (e) => {
@@ -1877,7 +1983,7 @@ function refreshBindUI() { for (const action in userBinds) { let btn = document.
 document.querySelectorAll(".bind-btn").forEach(btn => {
     if (btn.id === "timerVisibilitySelect") return; 
     btn.onclick = () => {
-        if (rebindingAction) document.getElementById(`bind-${rebindingAction}`).classList.remove("waiting");
+        clearPendingRebind();
         rebindingAction = btn.id.split("-")[1];
         btn.innerText = "Press key...";
         btn.classList.add("waiting");
