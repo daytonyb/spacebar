@@ -40,7 +40,8 @@ const tiles = [
     { id: 23, name: "Wind Left", color: "#2f4658" },
     { id: 24, name: "Wind Right", color: "#2f4658" },
     { id: 25, name: "Wind Up", color: "#2f4658" },
-    { id: 26, name: "Wind Down", color: "#2f4658" }
+    { id: 26, name: "Wind Down", color: "#2f4658" },
+    { id: 27, name: "Stray Keycap", color: "#e0e0e0" },
 ];
 
 // --- SETUP PALETTE ---
@@ -234,6 +235,13 @@ function draw() {
                     ctx.fillRect(left + 15, top + 4, 3, 5);
                     ctx.fillRect(left + 21, top + 6, 3, 3);
                 }
+            }
+            else if (tile === 27) {
+                // Draw a little keyboard keycap
+                ctx.fillStyle = "#a0a0a0"; 
+                ctx.fillRect(x * TILE_SIZE + 6, y * TILE_SIZE + 6, 20, 20);
+                ctx.fillStyle = "#e0e0e0"; 
+                ctx.fillRect(x * TILE_SIZE + 8, y * TILE_SIZE + 6, 16, 16);
             }
         }
     }
