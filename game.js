@@ -62,11 +62,11 @@ const stages = [
   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
   [0,0,2,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,2,0],
-  [0,0,1,1,0,0,0,0,1,1,1,0,0,0,0,0,0,1,1,1],
+  [0,0,10,10,0,0,0,0,10,10,10,0,0,0,0,0,0,1,1,1],
   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,1,1,1],
   [0,27,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,1,1,1],
   [0,0,2,0,0,0,0,0,2,0,0,0,0,2,0,0,0,1,1,1],
-  [0,0,0,0,0,2,0,0,0,1,1,1,0,0,0,0,0,1,1,1],
+  [0,0,0,0,0,2,0,0,0,10,10,10,0,0,0,0,0,1,1,1],
   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1],
   [9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,1,1,1]
 ],
@@ -109,14 +109,14 @@ const stages = [
 "2,-1": [
   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
   [9,9,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [0,1,0,0,0,0,0,2,0,0,0,0,0,0,2,0,0,0,1,1],
+  [1,1,0,0,0,0,0,2,0,0,0,0,0,0,2,0,0,0,1,1],
   [1,1,0,0,0,0,1,1,1,0,0,0,0,1,1,1,0,0,1,1],
   [1,1,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1],
   [1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1],
   [1,1,0,2,0,0,4,0,0,0,0,0,0,0,0,0,0,0,1,1],
-  [0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,1,1],
-  [0,0,0,2,0,1,1,0,0,0,2,0,0,1,1,0,2,0,1,1],
-  [10,10,10,10,10,1,1,1,1,1,1,1,1,1,1,10,10,10,1,1]
+  [1,1,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,1,1],
+  [1,1,0,2,0,1,1,0,0,0,2,0,0,1,1,0,2,0,1,1],
+  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,10,10,10,1,1]
 ],
 "3,-1": [
   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -152,7 +152,7 @@ const stages = [
   [0,0,0,0,0,0,1,1,1,0,0,0,2,0,0,0,0,0,0,1],
   [0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,1],
   [0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,4,1],
-  [1,1,1,9,9,9,9,9,9,9,9,9,9,9,9,9,1,10,10,1]
+  [1,1,1,9,9,9,9,9,9,9,9,9,9,9,9,10,10,10,10,1]
 ],
 "5,-2": [
   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
@@ -161,10 +161,10 @@ const stages = [
   [1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,1],
   [1,1,1,0,0,0,0,0,0,2,0,0,0,0,0,1,1,0,0,1],
   [1,1,1,0,0,0,0,0,1,1,1,0,0,0,0,1,1,0,0,1],
-  [1,1,1,0,0,0,0,0,1,1,1,0,0,0,0,1,1,0,0,1],
-  [1,1,1,0,0,0,0,0,1,1,1,0,0,0,0,1,1,0,0,1],
-  [1,1,1,0,0,0,0,0,1,1,1,0,0,0,0,1,1,0,0,1],
-  [1,1,1,9,9,9,9,9,1,1,1,9,9,9,9,1,1,0,0,1]
+  [1,1,1,9,9,9,9,9,1,1,1,9,9,9,9,1,1,0,0,1],
+  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,1],
+  [1,1,1,0,0,27,0,0,1,1,1,0,0,0,0,1,1,0,0,1],
+  [1,1,1,0,10,10,10,0,1,1,1,0,0,0,0,1,1,0,0,1]
 ],
 "1,-1": [
   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -174,20 +174,20 @@ const stages = [
   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1],
   [0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1],
   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,1,0],
-  [0,0,0,0,2,0,0,0,0,0,2,0,0,0,0,0,0,0,1,0],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,1,1],
+  [0,0,0,0,2,0,0,0,0,0,2,0,0,0,0,0,0,0,1,1],
   [9,0,0,9,1,1,9,9,9,9,1,1,9,9,9,9,9,9,1,1]
 ],
 "5,-1": [
   [1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
   [1,1,1,0,0,0,0,0,0,2,0,0,0,0,0,0,2,0,4,1],
   [1,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,1,1,1,1],
-  [0,0,1,0,9,9,9,9,9,1,1,9,9,9,9,9,1,1,1,1],
+  [1,1,1,0,9,9,9,9,9,1,1,9,9,9,9,9,1,1,1,1],
   [0,0,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
   [0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
   [0,0,1,0,2,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0],
-  [4,27,1,1,1,0,0,0,0,1,1,1,0,0,0,0,0,1,1,1],
+  [0,27,1,1,1,0,0,0,0,1,1,1,0,0,0,0,0,1,1,1],
   [1,1,1,1,1,9,9,9,9,1,1,1,9,9,9,9,9,1,1,1]
 ],
 "4,-3": [
@@ -306,6 +306,63 @@ const stages = [
             "4,-1": "Hold the Up Arrow to Dash Upwards",
             "4,-2": "Hold two directions to Dash Diagonally",
         }
+    },
+    {
+        title: "Stage 1",
+        rooms: {
+            "0,0": [
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1],
+  [1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1],
+  [1,1,0,0,0,0,0,0,0,0,0,0,2,2,0,0,0,0,1,1],
+  [1,1,0,3,0,0,0,0,0,0,0,1,1,1,1,0,0,0,1,1],
+  [1,1,1,1,1,1,1,0,0,0,0,1,1,1,1,0,0,0,1,1],
+  [1,1,1,1,1,1,1,9,9,9,9,1,1,1,1,9,9,9,1,1]
+],
+"1,0": [
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [1,1,1,0,0,0,0,0,0,7,0,0,0,0,0,0,0,0,0,0],
+  [1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [1,1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0],
+  [1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [1,1,1,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,0]
+],
+"1,1":[
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0,0,7,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [0,0,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9]
+],
+"1,2": [
+  [0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,7,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1],
+  [0,0,0,0,0,0,0,9,9,9,9,0,0,0,0,2,0,0,1,1],
+  [0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,1,1],
+  [0,4,0,2,0,0,0,1,1,1,1,0,0,0,2,0,0,0,1,1],
+  [1,1,1,1,1,9,9,1,1,1,1,9,9,1,1,1,9,9,1,1]
+],
+        },
+        roomNames: {},
+        signs: {
+
+        },
     },
 ];
 
@@ -628,10 +685,10 @@ window.addEventListener("keydown", (e) => {
         }
     }
 
-    if (e.code === userBinds.dash && !dashPressed) {
-        dashPressed = true;
-        if (player.hasDash && !player.isDashing) startDash();
-    }
+if (e.code === userBinds.dash && !dashPressed) {
+    dashPressed = true;
+    if (player.hasDash) startDash(); 
+}
 });
 
 window.addEventListener("keyup", (e) => {
@@ -744,6 +801,38 @@ function startDash() {
     player.dashTimer = player.dashDuration;
 }
 
+function getTileAtGlobal(tileX, tileY) {
+    let roomX = currentRoomX;
+    let roomY = currentRoomY;
+    let localX = tileX;
+    let localY = tileY;
+
+    // Shift rooms if checking outside boundaries (Using 20 and 10 directly)
+    while (localX < 0) { roomX--; localX += 20; }
+    while (localX >= 20) { roomX++; localX -= 20; }
+
+    while (localY < 0) { roomY--; localY += 10; }
+    while (localY >= 10) { roomY++; localY -= 10; }
+
+    // If it's inside the current room, just return the standard map tile
+    if (roomX === currentRoomX && roomY === currentRoomY) {
+        return map[localY] ? map[localY][localX] : null;
+    }
+
+    // Otherwise, fetch the map of the adjacent room
+    const roomKey = `${roomX},${roomY}`;
+    const currentStage = stages[currentStageIndex];
+    
+    // If the adjacent room doesn't exist
+    if (!currentStage || !currentStage.rooms[roomKey]) {
+        if (tileY >= 10) return 0; // Let them fall into the void (pits)
+        return 1; // Treat the world edge as a solid wall everywhere else
+    }
+
+    const targetMap = currentStage.rooms[roomKey];
+    return targetMap[localY] ? targetMap[localY][localX] : null;
+}
+
 function isSolidTile(tile) {
     if (tile === DASH_THROUGH_TILE) return !player.isDashing;
     return tile === 1 || tile === 5 || tile === 12 || tile === 13 || tile === LOCKED_BLOCK_TILE || tile === DASH_DRAIN_TILE || tile === BOUNCE_TILE || isWindTile(tile);
@@ -757,13 +846,11 @@ function isTouchingTile(px, py, targetTile) {
 
     for (let y = top; y <= bottom; y++) {
         for (let x = left; x <= right; x++) {
-            let checkX = Math.max(0, Math.min(x, 19));
-            if (map[y] && map[y][checkX] === targetTile) {
+            if (getTileAtGlobal(x, y) === targetTile) {
                 return true;
             }
         }
     }
-
     return false;
 }
 
@@ -775,8 +862,7 @@ function checkCollision(px, py) {
 
     for (let y = top; y <= bottom; y++) {
         for (let x = left; x <= right; x++) {
-            let checkX = Math.max(0, Math.min(x, 19)); 
-            if (map[y] && isSolidTile(map[y][checkX])) {
+            if (isSolidTile(getTileAtGlobal(x, y))) {
                 return true;
             }
         }
@@ -790,13 +876,12 @@ function getHorizontalCollisionTile(px, py, direction) {
     const edgeX = direction > 0
         ? Math.floor((px + player.width) / TILE_SIZE)
         : Math.floor(px / TILE_SIZE);
-    const checkX = Math.max(0, Math.min(edgeX, 19));
     const top = Math.floor(py / TILE_SIZE);
     const bottom = Math.floor((py + player.height - 0.1) / TILE_SIZE);
     let collidedTile = null;
 
     for (let y = top; y <= bottom; y++) {
-        const tile = map[y] ? map[y][checkX] : null;
+        const tile = getTileAtGlobal(edgeX, y);
         if (!isSolidTile(tile)) continue;
         if (tile === BOUNCE_TILE) return tile;
         collidedTile = tile;
@@ -816,8 +901,7 @@ function getVerticalCollisionTile(px, py, direction) {
     let collidedTile = null;
 
     for (let x = left; x <= right; x++) {
-        const checkX = Math.max(0, Math.min(x, 19));
-        const tile = map[edgeY] ? map[edgeY][checkX] : null;
+        const tile = getTileAtGlobal(x, edgeY);
         if (!isSolidTile(tile)) continue;
         if (tile === BOUNCE_TILE) return tile;
         collidedTile = tile;
@@ -929,9 +1013,8 @@ function drawWindBeamEffects() {
 }
 
 function checkHazards(px, py) {
-    // INCREASE THESE MARGINS to make spikes much more forgiving
-    let marginX = 8; // Shaves 8px off the left and right (16px total)
-    let marginY = 8; // Shaves 8px off the top and bottom 
+    let marginX = 8;
+    let marginY = 8;
 
     let left = Math.floor((px + marginX) / TILE_SIZE);
     let right = Math.floor((px + player.width - marginX) / TILE_SIZE);
@@ -940,7 +1023,7 @@ function checkHazards(px, py) {
 
     for (let y = top; y <= bottom; y++) {
         for (let x = left; x <= right; x++) {
-            if (map[y] && map[y][x] === 9) { die(); return; }
+            if (getTileAtGlobal(x, y) === 9) { die(); return; }
         }
     }
 }
@@ -1260,18 +1343,18 @@ function update() {
         player.vy += player.gravity;
     }
 
-    let bottomY = Math.floor((player.y + player.height + 0.1) / TILE_SIZE);
-    let centerX = Math.floor((player.x + player.width / 2) / TILE_SIZE);
+let bottomY = Math.floor((player.y + player.height + 0.1) / TILE_SIZE);
+let centerX = Math.floor((player.x + player.width / 2) / TILE_SIZE);
 
-    // Only apply push if falling/standing, not while jumping up
-    if (player.vy >= 0 && map[bottomY]) {
-        let floorTile = map[bottomY][centerX];
-        if (floorTile === 12) {
-            player.vx -= 0.6; // Push Left
-        } else if (floorTile === 13) {
-            player.vx += 0.6; // Push Right
-        }
+// Only apply push if falling/standing, not while jumping up
+if (player.vy >= 0) {
+    let floorTile = getTileAtGlobal(centerX, bottomY);
+    if (floorTile === 12) {
+        player.vx -= 0.6; // Push Left
+    } else if (floorTile === 13) {
+        player.vx += 0.6; // Push Right
     }
+}
 
     applyWindForces();
 
@@ -1336,29 +1419,29 @@ function update() {
                 player.vy = 0;
             }
         }
-    } else if (player.vy > 0) { 
-        // ONE-WAY PLATFORM LOGIC (Only check if we are falling down)
-        let left = Math.floor(player.x / TILE_SIZE);
-        let right = Math.floor((player.x + player.width - 0.1) / TILE_SIZE);
-        let bottom = Math.floor((player.y + player.height - 0.1) / TILE_SIZE);
-        let crumbleTilesToActivate = new Set();
+} else if (player.vy > 0) { 
+    // ONE-WAY PLATFORM LOGIC
+    let left = Math.floor(player.x / TILE_SIZE);
+    let right = Math.floor((player.x + player.width - 0.1) / TILE_SIZE);
+    let bottom = Math.floor((player.y + player.height - 0.1) / TILE_SIZE);
+    let crumbleTilesToActivate = new Set();
+    
+    for (let x = left; x <= right; x++) {
+        let tile = getTileAtGlobal(x, bottom);
         
-        for (let x = left; x <= right; x++) {
-            let checkX = Math.max(0, Math.min(x, 19));
-            let tile = map[bottom] ? map[bottom][checkX] : null;
+        if (tile === 10 || tile === CRUMBLE_TILE) {
+            let platformTop = bottom * TILE_SIZE;
             
-            if (tile === 10 || tile === CRUMBLE_TILE) {
-                let platformTop = bottom * TILE_SIZE;
-                
-                // Only snap to the platform if our feet were previously ABOVE the platform's top edge
-                // AND we aren't holding the DOWN key (Bonus: allows dropping through!)
-                if (oldY + player.height <= platformTop + 0.5 && !keys.down) {
-                    player.y = platformTop - player.height - 0.1;
-                    player.vy = 0;
-                    if (tile === CRUMBLE_TILE) crumbleTilesToActivate.add(getTileKey(checkX, bottom));
+            if (oldY + player.height <= platformTop + 0.5 && !keys.down) {
+                player.y = platformTop - player.height - 0.1;
+                player.vy = 0;
+                // Only activate crumbles in the CURRENT room to prevent visual bugs
+                if (tile === CRUMBLE_TILE && x >= 0 && x < COLS && bottom >= 0 && bottom < ROWS) {
+                    crumbleTilesToActivate.add(getTileKey(x, bottom));
                 }
             }
         }
+    }
 
         for (const tileKey of crumbleTilesToActivate) {
             const [x, y] = tileKey.split(",").map(Number);
