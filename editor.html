@@ -11,18 +11,26 @@
         <h1>Level Editor</h1>
         
         <div class="main-workspace">
-            <canvas id="editorCanvas" width="640" height="320"></canvas>
-            
-            <div class="palette-container">
-                <h3>Tiles</h3>
-                <div id="palette" class="palette-grid">
-                    </div>
+            <div class="canvas-panel">
+                <div class="canvas-scroller">
+                    <canvas id="editorCanvas" width="1280" height="736"></canvas>
+                </div>
             </div>
-        </div>
 
-        <div class="tools">
-            <button id="btnFill">Fill Map with Selected</button>
-            <button id="btnClear" style="background-color: #cc0000;">Clear Map (Erase All)</button>
+            <aside class="editor-sidebar">
+                <div class="palette-container">
+                    <h3>Tiles</h3>
+                    <div id="palette" class="palette-grid"></div>
+                </div>
+
+                <div class="sidebar-card">
+                    <h3>Quick Actions</h3>
+                    <div class="tools">
+                        <button id="btnFill">Fill Map with Selected</button>
+                        <button id="btnClear" style="background-color: #cc0000;">Clear Map (Erase All)</button>
+                    </div>
+                </div>
+            </aside>
         </div>
 
         <div class="io-section">

@@ -2,6 +2,26 @@ const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
 const TILE_SIZE = 32;
+const ROOM_COLS = 40;
+const ROOM_ROWS = 23;
+const COLS = ROOM_COLS;
+const ROWS = ROOM_ROWS;
+const OBJECT_SIZE = Math.floor(TILE_SIZE / 2);
+const PLAYER_SIZE = Math.floor((TILE_SIZE * 3) / 4);
+const KEYCAP_SIZE = Math.floor((TILE_SIZE * 5) / 8);
+const KEYCAP_INNER_SIZE = Math.floor(TILE_SIZE / 2);
+const HALF_TILE = TILE_SIZE / 2;
+const OBJECT_OFFSET = Math.floor((TILE_SIZE - OBJECT_SIZE) / 2);
+const PLAYER_OFFSET = Math.floor((TILE_SIZE - PLAYER_SIZE) / 2);
+const KEYCAP_OFFSET = Math.floor((TILE_SIZE - KEYCAP_SIZE) / 2);
+const KEYCAP_INNER_OFFSET = Math.floor((KEYCAP_SIZE - KEYCAP_INNER_SIZE) / 2);
+const PLAYER_EDGE_INSET = Math.floor(TILE_SIZE / 8);
+const HELD_OBJECT_Y_OFFSET = KEYCAP_SIZE + 5;
+const HELD_OBJECT_SPACING = KEYCAP_SIZE + 2;
+
+canvas.width = ROOM_COLS * TILE_SIZE;
+canvas.height = ROOM_ROWS * TILE_SIZE;
+
 const TUTORIAL_STAGE_INDEX = 0;
 
 // --- STAGE & ROOM DATA ---
@@ -47,348 +67,114 @@ const stages = [
         title: "Tutorial",
         rooms: {
 "0,0": [
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [1,1,1,1,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [1,1,1,1,1,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0],
-  [1,1,1,1,1,0,0,0,0,0,1,1,1,0,0,1,1,0,0,0],
-  [1,1,1,1,1,3,0,11,0,2,1,1,1,0,0,1,1,0,0,0],
-  [1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1,1],
-  [1,1,1,1,1,1,1,1,1,1,1,1,1,9,9,1,1,1,1,1]
-],
-"-1,0": [
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [0,0,2,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,2,0],
-  [0,0,10,10,0,0,0,0,10,10,10,0,0,0,0,0,0,1,1,1],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,1,1,1],
-  [0,27,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,1,1,1],
-  [0,0,2,0,0,0,0,0,2,0,0,0,0,2,0,0,0,1,1,1],
-  [0,0,0,0,0,2,0,0,0,10,10,10,0,0,0,0,0,1,1,1],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1],
-  [9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,1,1,1]
-],
-"1,0": [
-  [1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,27,0,0,0,0,0,0],
-  [0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1],
-  [0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0],
-  [0,0,0,0,4,0,0,2,0,0,0,0,0,2,0,0,0,0,0,0],
-  [0,0,0,1,1,1,1,1,1,0,0,0,1,1,1,0,0,0,1,1],
-  [0,2,0,1,1,1,1,1,1,0,0,0,1,1,1,0,0,0,1,1],
-  [1,1,1,1,1,1,1,1,1,0,0,0,1,1,1,0,0,0,1,1],
-  [1,1,1,1,1,1,1,1,1,9,9,9,1,1,1,9,9,9,1,1]
-],
-"2,0": [
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,1,1],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,10,10,10,1,1],
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,1,1],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1],
-  [0,4,0,2,0,0,0,0,0,0,2,2,0,0,0,1,1,1,1,1],
-  [1,1,1,1,1,0,0,0,0,1,1,1,1,0,0,1,1,1,1,1],
-  [1,1,1,1,1,0,0,0,0,1,1,1,1,0,0,1,1,1,1,1],
-  [1,1,1,1,1,0,0,0,0,1,1,1,1,0,0,1,1,1,1,1],
-  [1,1,1,1,1,9,9,9,9,1,1,1,1,9,9,1,1,1,1,1]
-], 
-"2,-1": [
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [9,9,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [1,1,0,0,0,0,0,2,0,0,0,0,0,0,2,0,0,0,1,1],
-  [1,1,0,0,0,0,1,1,1,0,0,0,0,1,1,1,0,0,1,1],
-  [1,1,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1],
-  [1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1],
-  [1,1,0,2,0,0,4,0,0,0,0,0,0,0,0,0,0,0,1,1],
-  [1,1,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,1,1],
-  [1,1,0,2,0,1,1,0,0,0,2,0,0,1,1,0,2,0,1,1],
-  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,10,10,10,1,1]
-],
-"3,-1": [
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1],
-  [1,1,1,0,0,0,2,0,0,0,11,0,0,0,0,0,2,0,1,1],
-  [1,1,1,0,0,0,0,0,0,1,1,1,0,0,0,1,1,1,1,1],
-  [1,1,1,0,0,0,0,0,0,1,1,1,0,0,0,1,1,1,1,1],
-  [1,1,1,0,0,0,0,0,0,1,1,1,0,0,0,1,1,1,1,1],
-  [1,1,1,9,9,9,9,9,9,1,1,1,9,9,9,1,1,1,1,1]
-],
-"4,-1": [
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,1],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,1,1,1],
-  [0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1],
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0],
-  [1,1,1,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0],
-  [1,1,1,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [1,1,1,0,0,0,0,0,0,11,0,0,0,0,0,0,0,0,0,0],
-  [1,1,1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0],
-  [1,1,1,9,9,9,9,9,1,1,1,1,1,9,9,9,9,9,9,9]
-],
-"4,-2": [
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [0,0,0,0,0,0,0,11,0,0,0,0,0,0,0,0,0,0,0,0],
-  [0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,1,1,1,0,0],
-  [0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,1],
-  [0,0,0,0,0,0,1,1,1,0,0,0,2,0,0,0,0,0,0,1],
-  [0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,1],
-  [0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,4,1],
-  [1,1,1,9,9,9,9,9,9,9,9,9,9,9,9,10,10,10,10,1]
-],
-"5,-2": [
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [4,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,1],
-  [1,1,1,0,0,0,0,0,0,2,0,0,0,0,0,1,1,0,0,1],
-  [1,1,1,0,0,0,0,0,1,1,1,0,0,0,0,1,1,0,0,1],
-  [1,1,1,9,9,9,9,9,1,1,1,9,9,9,9,1,1,0,0,1],
-  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,1],
-  [1,1,1,0,0,27,0,0,1,1,1,0,0,0,0,1,1,0,0,1],
-  [1,1,1,0,10,10,10,0,1,1,1,0,0,0,0,1,1,0,0,1]
-],
-"1,-1": [
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [0,0,27,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1],
-  [0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,1,1],
-  [0,0,0,0,2,0,0,0,0,0,2,0,0,0,0,0,0,0,1,1],
-  [9,0,0,9,1,1,9,9,9,9,1,1,9,9,9,9,9,9,1,1]
-],
-"5,-1": [
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [1,1,1,0,0,0,0,0,0,2,0,0,0,0,0,0,2,0,4,1],
-  [1,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,1,1,1,1],
-  [1,1,1,0,9,9,9,9,9,1,1,9,9,9,9,9,1,1,1,1],
-  [0,0,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-  [0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [0,0,1,0,2,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0],
-  [0,27,1,1,1,0,0,0,0,1,1,1,0,0,0,0,0,1,1,1],
-  [1,1,1,1,1,9,9,9,9,1,1,1,9,9,9,9,9,1,1,1]
-],
-"4,-3": [
-  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-  [1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0],
-  [1,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0],
-  [1,0,0,0,0,27,0,0,1,1,1,0,0,0,0,0,0,0,0,0],
-  [1,0,0,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0],
-  [1,0,0,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0],
-  [1,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0],
-  [1,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0],
-  [1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0],
-  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-],
-"5,-3":[
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,1],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,1],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1]
-],
-"5,-4": [
-  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [1,0,0,27,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [1,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [1,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,2,0,1],
-  [1,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,10,10,10,1]
-],
-"6,-1":[
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,2,0,0],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0],
-  [0,0,0,0,0,0,0,0,2,0,0,1,0,0,0,0,0,0,0,0],
-  [0,0,2,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,2],
-  [0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0],
-  [4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [1,1,1,1,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9]
-],
-"3,-2": [
-  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [1,0,0,0,0,0,0,0,0,0,27,0,0,0,0,0,0,0,0,0],
-  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [1,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0],
-  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [1,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0],
-  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [1,10,10,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
-],
-"6,-2": [
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [1,0,0,8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,10,10,10,10,10,1]
-],
-"2,-2": [
-  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1]
-],
-"1,-2": [
-  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-],
-},
-        roomNames: {},
-        signs: {
-            "0,0": "Press Spacebar to Jump",
-            "3,-1": "Press Left Shift to Dash",
-            "4,-1": "Hold the Up Arrow to Dash Upwards",
-            "4,-2": "Hold two directions to Dash Diagonally",
-        }
-    },
-    {
-        title: "Stage 1",
-        rooms: {
-            "0,0": [
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1],
-  [1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1],
-  [1,1,0,0,0,0,0,0,0,0,0,0,2,2,0,0,0,0,1,1],
-  [1,1,0,3,0,0,0,0,0,0,0,1,1,1,1,0,0,0,1,1],
-  [1,1,1,1,1,1,1,0,0,0,0,1,1,1,1,0,0,0,1,1],
-  [1,1,1,1,1,1,1,9,9,9,9,1,1,1,1,9,9,9,1,1]
-],
-"1,0": [
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [1,1,1,0,0,0,0,0,0,7,0,0,0,0,0,0,0,0,0,0],
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0],
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [1,1,1,9,9,9,9,9,9,9,9,9,9,9,9,9,9,0,0,1]
-],
-"1,1":[
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,1],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,0,1,1,1],
-  [0,0,0,0,0,0,0,0,0,0,7,0,0,0,0,0,0,1,1,1],
-  [0,0,0,0,0,7,0,0,0,0,0,0,0,0,0,0,0,1,1,1],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1],
-  [0,0,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,1,1,1]
-],
-"1,2": [
-  [0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0],
-  [0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0],
-  [0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0],
-  [0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0],
-  [0,0,0,0,0,0,7,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1],
-  [0,0,0,0,0,0,0,9,9,9,9,0,0,0,0,2,0,0,1,1],
-  [0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,1,1],
-  [0,4,0,2,0,0,0,1,1,1,1,0,0,0,2,0,0,0,1,1],
-  [1,1,1,1,1,9,9,1,1,1,1,9,9,1,1,1,9,9,1,1]
-],
-"2,2": [
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,15,0,2,0,0],
-  [0,0,0,0,0,0,0,0,0,0,14,0,0,0,0,15,0,0,0,0],
-  [0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,15,0,2,0,0],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0],
-  [0,4,2,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0],
-  [1,1,1,1,0,0,0,0,0,0,0,0,0,0,7,0,1,1,1,0],
-  [1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0],
-  [1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0],
-  [1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0],
-  [1,1,1,1,9,9,9,9,9,9,9,9,9,9,9,9,1,1,1,9]
-],
-"2,1": [
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,15,0,0],
-  [0,0,0,0,0,0,0,0,2,0,0,0,0,2,0,0,0,15,0,0],
-  [0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,15,0,0],
-  [0,2,0,14,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [0,0,2,0,0,0,0,2,0,0,0,0,2,0,0,0,0,0,0,1],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,1,0,0,0,1],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,2,0,4,1],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,10,10,10,10,1]
-],
-"3,1": [
-  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,15,15,15,15,15,1],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [0,4,0,0,0,0,0,0,0,0,2,0,0,2,0,0,14,0,0,0],
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,0,0],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [0,14,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [0,0,0,0,0,0,0,0,0,0,7,0,0,0,0,0,0,0,0,0],
-  [0,2,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9]
-],
-"3,0": [
-  [15,15,15,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,14,0,0,0,0,0],
-  [0,7,0,0,0,0,0,0,0,0,7,0,0,0,2,0,0,0,0,0],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [0,0,0,0,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,4,0,0],
-  [9,9,9,9,9,9,9,9,9,9,9,9,9,9,10,10,10,10,10,10]
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,3,0,0,0,0,0,2,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
 ],
         },
         roomNames: {},
         signs: {
 
-        },
+        }
     },
+
 ];
+
+function isRoomTerrainTile(tile) {
+    return tile === 1
+        || tile === 5
+        || tile === 6
+        || tile === 9
+        || tile === 10
+        || tile === 12
+        || tile === 13
+        || tile === LOCKED_BLOCK_TILE
+        || tile === CRUMBLE_TILE
+        || tile === DASH_THROUGH_TILE
+        || tile === DASH_DRAIN_TILE
+        || tile === ESCORT_LOCK_TILE
+        || tile === BOUNCE_TILE
+        || isWindTile(tile);
+}
+
+function getScaledIndexRange(index, sourceSize, targetSize) {
+    const start = Math.floor((index * targetSize) / sourceSize);
+    const end = Math.max(start, Math.floor(((index + 1) * targetSize) / sourceSize) - 1);
+    return { start, end };
+}
+
+function resizeRoomMap(roomMap) {
+    const sourceRows = roomMap.length;
+    const sourceCols = roomMap[0]?.length || 0;
+
+    if (sourceRows === ROOM_ROWS && sourceCols === ROOM_COLS) {
+        return roomMap.map(row => row.slice());
+    }
+
+    const resized = Array.from({ length: ROOM_ROWS }, () => Array(ROOM_COLS).fill(0));
+
+    for (let y = 0; y < sourceRows; y++) {
+        const { start: targetRowStart, end: targetRowEnd } = getScaledIndexRange(y, sourceRows, ROOM_ROWS);
+
+        for (let x = 0; x < sourceCols; x++) {
+            const tile = roomMap[y][x];
+            if (!isRoomTerrainTile(tile)) continue;
+
+            const { start: targetColStart, end: targetColEnd } = getScaledIndexRange(x, sourceCols, ROOM_COLS);
+            for (let targetY = targetRowStart; targetY <= targetRowEnd; targetY++) {
+                for (let targetX = targetColStart; targetX <= targetColEnd; targetX++) {
+                    resized[targetY][targetX] = tile;
+                }
+            }
+        }
+    }
+
+    for (let y = 0; y < sourceRows; y++) {
+        const { start: targetRowStart, end: targetRowEnd } = getScaledIndexRange(y, sourceRows, ROOM_ROWS);
+
+        for (let x = 0; x < sourceCols; x++) {
+            const tile = roomMap[y][x];
+            if (tile === 0 || isRoomTerrainTile(tile)) continue;
+
+            const { start: targetColStart, end: targetColEnd } = getScaledIndexRange(x, sourceCols, ROOM_COLS);
+            const targetX = Math.floor((targetColStart + targetColEnd) / 2);
+            const targetY = Math.floor((targetRowStart + targetRowEnd) / 2);
+            resized[targetY][targetX] = tile;
+        }
+    }
+
+    return resized;
+}
+
+function normalizeStageRooms() {
+    stages.forEach(stage => {
+        Object.keys(stage.rooms).forEach(roomKey => {
+            stage.rooms[roomKey] = resizeRoomMap(stage.rooms[roomKey]);
+        });
+    });
+}
+
+normalizeStageRooms();
 
 // --- TIMER STATE ---
 const storedTimerVisibility = localStorage.getItem("timerVisibility");
@@ -413,10 +199,10 @@ const timerVisibilitySelect = document.getElementById("timerVisibilitySelect");
 timerVisibilitySelect.value = isTimerVisible ? "visible" : "hidden";
 
 const player = {
-    x: 0, y: 0, width: 24, height: 24, 
+    x: 0, y: 0, width: PLAYER_SIZE, height: PLAYER_SIZE,
     vx: 0, vy: 0,
-    friction: 0.8, gravity: 0.4, jumpPower: -8,
-    potions: 0, facing: 1, hasDash: true, isDashing: false, dashTimer: 0, dashDuration: 12, dashSpeed: 10
+    friction: 0.8, gravity: 0.4, jumpPower: -9,
+    potions: 0, facing: 1, hasDash: true, isDashing: false, dashTimer: 0, dashDuration: 12, dashSpeed: 12
 };
 
 let deathParticles = [];
@@ -759,8 +545,8 @@ function loadRoom(rx, ry, entrance = 'spawn') {
         for (let y = 0; y < map.length; y++) {
             for (let x = 0; x < map[y].length; x++) {
                 if (map[y][x] === 3) {
-                    player.x = x * TILE_SIZE + 4; 
-                    player.y = y * TILE_SIZE + 4;
+                    player.x = x * TILE_SIZE + PLAYER_OFFSET;
+                    player.y = y * TILE_SIZE + PLAYER_OFFSET;
                     map[y][x] = 0; 
                     if (!activeCheckpoint) activeCheckpoint = { rx, ry, px: player.x, py: player.y, cx: x, cy: y };
                 }
@@ -802,7 +588,7 @@ function die() {
             y: player.y + player.height / 2,
             vx: Math.cos(angle) * speed,
             vy: Math.sin(angle) * speed,
-            radius: 8
+            radius: Math.floor(TILE_SIZE / 4)
         });
     }
 }
@@ -831,12 +617,11 @@ function getTileAtGlobal(tileX, tileY) {
     let localX = tileX;
     let localY = tileY;
 
-    // Shift rooms if checking outside boundaries (Using 20 and 10 directly)
-    while (localX < 0) { roomX--; localX += 20; }
-    while (localX >= 20) { roomX++; localX -= 20; }
+    while (localX < 0) { roomX--; localX += COLS; }
+    while (localX >= COLS) { roomX++; localX -= COLS; }
 
-    while (localY < 0) { roomY--; localY += 10; }
-    while (localY >= 10) { roomY++; localY -= 10; }
+    while (localY < 0) { roomY--; localY += ROWS; }
+    while (localY >= ROWS) { roomY++; localY -= ROWS; }
 
     // If it's inside the current room, just return the standard map tile
     if (roomX === currentRoomX && roomY === currentRoomY) {
@@ -849,7 +634,7 @@ function getTileAtGlobal(tileX, tileY) {
     
     // If the adjacent room doesn't exist
     if (!currentStage || !currentStage.rooms[roomKey]) {
-        if (tileY >= 10) return 0; // Let them fall into the void (pits)
+        if (tileY >= ROWS) return 0; // Let them fall into the void (pits)
         return 1; // Treat the world edge as a solid wall everywhere else
     }
 
@@ -1037,8 +822,8 @@ function drawWindBeamEffects() {
 }
 
 function checkHazards(px, py) {
-    let marginX = 8;
-    let marginY = 8;
+    let marginX = Math.floor(TILE_SIZE / 4);
+    let marginY = Math.floor(TILE_SIZE / 4);
 
     let left = Math.floor((px + marginX) / TILE_SIZE);
     let right = Math.floor((px + player.width - marginX) / TILE_SIZE);
@@ -1069,7 +854,7 @@ function checkInteractions(px, py) {
                 activeSignText = currentStage.signs[roomKey];
             }
         }
-        else if (centerTile === 4) activeCheckpoint = { rx: currentRoomX, ry: currentRoomY, px: cx * TILE_SIZE + 4, py: cy * TILE_SIZE + 4, cx, cy };
+        else if (centerTile === 4) activeCheckpoint = { rx: currentRoomX, ry: currentRoomY, px: cx * TILE_SIZE + PLAYER_OFFSET, py: cy * TILE_SIZE + PLAYER_OFFSET, cx, cy };
         else if (centerTile === 8) { finishStage(); return true; }
         else if (centerTile === PORTAL_TILE) { return tryUsePortal(cx, cy); }
         
@@ -1082,7 +867,7 @@ function checkInteractions(px, py) {
     }
 
     // 2. TRUE MAGNETIZED COLLECTIBLES (AABB Sprite Collision)
-    let scanMargin = 16; 
+    let scanMargin = TILE_SIZE / 2;
     let left = Math.floor((px - scanMargin) / TILE_SIZE);
     let right = Math.floor((px + player.width + scanMargin) / TILE_SIZE);
     let top = Math.floor((py - scanMargin) / TILE_SIZE);
@@ -1090,17 +875,16 @@ function checkInteractions(px, py) {
 
     for (let y = top; y <= bottom; y++) {
         for (let x = left; x <= right; x++) {
-            if (!map[y] || x < 0 || x >= 20) continue;
+            if (!map[y] || x < 0 || x >= COLS) continue;
             let tile = map[y][x];
 
             // If it's a collectible, do a pixel-perfect check against its actual sprite
             if (tile === 2 || tile === 7 || tile === KEY_TILE || tile === ESCORT_KEY_TILE || tile === KEYCAP_TILE) {
                 
-                // The actual visual box of the item (16x16 in the center of the 32x32 tile)
-                let itemX = x * TILE_SIZE + 8;
-                let itemY = y * TILE_SIZE + 8;
-                let itemW = 16;
-                let itemH = 16;
+                let itemX = x * TILE_SIZE + OBJECT_OFFSET;
+                let itemY = y * TILE_SIZE + OBJECT_OFFSET;
+                let itemW = OBJECT_SIZE;
+                let itemH = OBJECT_SIZE;
 
                 // The player's box, expanded by the magnet reach
                 let reach = 2; 
@@ -1135,11 +919,11 @@ function checkInteractions(px, py) {
                             let angle = (i / 6) * Math.PI * 2;
                             let speed = 2 + Math.random() * 2; // Random speed outward
                             collectParticles.push({
-                                x: x * TILE_SIZE + 16, // Center of the tile
-                                y: y * TILE_SIZE + 16,
+                                x: x * TILE_SIZE + HALF_TILE,
+                                y: y * TILE_SIZE + HALF_TILE,
                                 vx: Math.cos(angle) * speed,
                                 vy: Math.sin(angle) * speed,
-                                radius: 4,
+                                radius: Math.max(2, OBJECT_SIZE / 2),
                                 alpha: 1,
                                 color: pColor
                             });
@@ -1257,11 +1041,11 @@ function updateCrumblePlatforms() {
 
 function getSteppedOnTile(targetTile) {
     let footY = Math.floor((player.y + player.height + 0.1) / TILE_SIZE);
-    let left = Math.floor((player.x + 4) / TILE_SIZE);
-    let right = Math.floor((player.x + player.width - 4) / TILE_SIZE);
+    let left = Math.floor((player.x + PLAYER_EDGE_INSET) / TILE_SIZE);
+    let right = Math.floor((player.x + player.width - PLAYER_EDGE_INSET) / TILE_SIZE);
 
     for (let x = left; x <= right; x++) {
-        let checkX = Math.max(0, Math.min(x, 19));
+        let checkX = Math.max(0, Math.min(x, COLS - 1));
         if (map[footY] && map[footY][checkX] === targetTile) {
             return getTileKey(checkX, footY);
         }
@@ -1498,7 +1282,7 @@ if (player.vy >= 0) {
             let right = Math.floor((player.x + player.width - 0.1) / TILE_SIZE);
             let checkBottom = Math.floor((player.y + player.height) / TILE_SIZE);
             for (let cx = left; cx <= right; cx++) {
-                let checkX = Math.max(0, Math.min(cx, 19));
+                let checkX = Math.max(0, Math.min(cx, COLS - 1));
                 let t = map[checkBottom] ? map[checkBottom][checkX] : null;
                 // If touching a one-way or crumble plat exactly on top
                 if ((t === 10 || t === CRUMBLE_TILE) && Math.abs((player.y + player.height) - (checkBottom * TILE_SIZE)) < 1) {
@@ -1515,7 +1299,7 @@ if (player.vy >= 0) {
                 // NEW: Spawn a satisfying "Saved!" particle burst
                 // Calculate roughly where this specific keycap was floating above the player
                 const keyX = player.x + (player.width / 2);
-                const keyY = player.y - 25 - (index * 22);
+                const keyY = player.y - HELD_OBJECT_Y_OFFSET - (index * HELD_OBJECT_SPACING);
 
                 // Gold for brand new keycaps, Light Grey for ghost keycaps
                 const burstColor = keycap.isGhost ? "#aaaaaa" : "#ffd700"; 
@@ -1549,7 +1333,7 @@ function draw() {
         for (let x = 0; x < map[y].length; x++) {
             let tile = map[y][x];
             if (tile === 1) { ctx.fillStyle = "#666"; ctx.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE); }
-            else if (tile === 2) { ctx.fillStyle = "#00ff88"; ctx.fillRect(x * TILE_SIZE + 8, y * TILE_SIZE + 8, 16, 16); }
+            else if (tile === 2) { ctx.fillStyle = "#00ff88"; ctx.fillRect(x * TILE_SIZE + OBJECT_OFFSET, y * TILE_SIZE + OBJECT_OFFSET, OBJECT_SIZE, OBJECT_SIZE); }
             else if (tile === 4) {
                 let active = activeCheckpoint && activeCheckpoint.rx === currentRoomX && activeCheckpoint.ry === currentRoomY && activeCheckpoint.cx === x && activeCheckpoint.cy === y;
                 ctx.fillStyle = active ? "#00ff88" : "#ffd700";
@@ -1561,9 +1345,15 @@ function draw() {
                 ctx.strokeStyle = "#4444ff"; ctx.lineWidth = 2; ctx.strokeRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
             }
             else if (tile === 7) {
-                ctx.fillStyle = "#00ccff"; ctx.beginPath(); ctx.moveTo(x * TILE_SIZE + 16, y * TILE_SIZE + 4); ctx.lineTo(x * TILE_SIZE + 28, y * TILE_SIZE + 16); ctx.lineTo(x * TILE_SIZE + 16, y * TILE_SIZE + 28); ctx.lineTo(x * TILE_SIZE + 4, y * TILE_SIZE + 16); ctx.fill();
+                ctx.fillStyle = "#00ccff";
+                ctx.beginPath();
+                ctx.moveTo(x * TILE_SIZE + 16, y * TILE_SIZE + 4);
+                ctx.lineTo(x * TILE_SIZE + 28, y * TILE_SIZE + 16);
+                ctx.lineTo(x * TILE_SIZE + 16, y * TILE_SIZE + 28);
+                ctx.lineTo(x * TILE_SIZE + 4, y * TILE_SIZE + 16);
+                ctx.fill();
             }
-            else if (tile === 8) { ctx.fillStyle = "#0044ff"; ctx.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE); ctx.fillStyle = "#00ccff"; ctx.fillRect(x * TILE_SIZE + 8, y * TILE_SIZE + 8, 16, 16); }
+            else if (tile === 8) { ctx.fillStyle = "#0044ff"; ctx.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE); ctx.fillStyle = "#00ccff"; ctx.fillRect(x * TILE_SIZE + OBJECT_OFFSET, y * TILE_SIZE + OBJECT_OFFSET, OBJECT_SIZE, OBJECT_SIZE); }
             else if (tile === 9) { ctx.fillStyle = "#ff0000"; ctx.beginPath(); ctx.moveTo(x * TILE_SIZE + 16, y * TILE_SIZE + 8); ctx.lineTo(x * TILE_SIZE + 32, y * TILE_SIZE + 32); ctx.lineTo(x * TILE_SIZE, y * TILE_SIZE + 32); ctx.fill(); }
 
             else if (tile === 10) { 
@@ -1779,27 +1569,27 @@ function draw() {
                 let isGhost = permanentlyCollectedKeycaps[keycapId];
                 
                 const floatOffset = Math.sin(performance.now() / 250) * 3;
-                const left = x * TILE_SIZE + 6;
-                const top = y * TILE_SIZE + 6 + floatOffset;
+                const left = x * TILE_SIZE + KEYCAP_OFFSET;
+                const top = y * TILE_SIZE + KEYCAP_OFFSET + floatOffset;
 
                 if (isGhost) {
                     ctx.fillStyle = "rgba(40, 40, 40, 0.7)"; 
-                    ctx.fillRect(left, top, 20, 20);
+                    ctx.fillRect(left, top, KEYCAP_SIZE, KEYCAP_SIZE);
                     ctx.fillStyle = "rgba(80, 80, 80, 0.7)"; 
-                    ctx.fillRect(left + 2, top, 16, 16);
+                    ctx.fillRect(left + KEYCAP_INNER_OFFSET, top, KEYCAP_INNER_SIZE, KEYCAP_INNER_SIZE);
                     ctx.fillStyle = "rgba(150, 150, 150, 0.5)";
                 } else {
                     ctx.fillStyle = "#888"; 
-                    ctx.fillRect(left, top, 20, 20);
+                    ctx.fillRect(left, top, KEYCAP_SIZE, KEYCAP_SIZE);
                     ctx.fillStyle = "#ddd"; 
-                    ctx.fillRect(left + 2, top, 16, 16);
+                    ctx.fillRect(left + KEYCAP_INNER_OFFSET, top, KEYCAP_INNER_SIZE, KEYCAP_INNER_SIZE);
                     ctx.fillStyle = "#555";
                 }
                 
                 ctx.font = "bold 12px monospace";
                 ctx.textAlign = "center";
                 ctx.textBaseline = "middle";
-                ctx.fillText("?", left + 10, top + 8);
+                ctx.fillText("?", left + (KEYCAP_SIZE / 2), top + (KEYCAP_INNER_SIZE / 2));
             }
         }
     }
@@ -1859,29 +1649,29 @@ function draw() {
         currentlyHeldKeycaps.forEach((keycap, index) => {
             // Offset them so they form a vertical floating stack above the player!
             const floatOffset = Math.sin((performance.now() / 200) + index) * 4;
-            const keyX = player.x + (player.width / 2) - 10;
-            const keyY = player.y - 25 - (index * 22) + floatOffset;
+            const keyX = player.x + (player.width / 2) - (KEYCAP_SIZE / 2);
+            const keyY = player.y - HELD_OBJECT_Y_OFFSET - (index * HELD_OBJECT_SPACING) + floatOffset;
 
             if (keycap.isGhost) {
                 // Ghost Keycap Trail
                 ctx.fillStyle = "rgba(40, 40, 40, 0.7)"; 
-                ctx.fillRect(keyX, keyY, 20, 20);
+                ctx.fillRect(keyX, keyY, KEYCAP_SIZE, KEYCAP_SIZE);
                 ctx.fillStyle = "rgba(80, 80, 80, 0.7)"; 
-                ctx.fillRect(keyX + 2, keyY, 16, 16);
+                ctx.fillRect(keyX + KEYCAP_INNER_OFFSET, keyY, KEYCAP_INNER_SIZE, KEYCAP_INNER_SIZE);
                 ctx.fillStyle = "rgba(150, 150, 150, 0.5)";
             } else {
                 // Bright New Keycap Trail
                 ctx.fillStyle = "#888"; 
-                ctx.fillRect(keyX, keyY, 20, 20);
+                ctx.fillRect(keyX, keyY, KEYCAP_SIZE, KEYCAP_SIZE);
                 ctx.fillStyle = "#ddd"; 
-                ctx.fillRect(keyX + 2, keyY, 16, 16);
+                ctx.fillRect(keyX + KEYCAP_INNER_OFFSET, keyY, KEYCAP_INNER_SIZE, KEYCAP_INNER_SIZE);
                 ctx.fillStyle = "#555";
             }
             
             ctx.font = "bold 12px monospace";
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
-            ctx.fillText("?", keyX + 10, keyY + 8);
+            ctx.fillText("?", keyX + (KEYCAP_SIZE / 2), keyY + (KEYCAP_INNER_SIZE / 2));
         });
     }
 

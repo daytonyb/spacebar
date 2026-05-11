@@ -3,8 +3,19 @@ const ctx = canvas.getContext("2d");
 const textarea = document.getElementById("ioTextarea");
 
 const TILE_SIZE = 32;
-const ROWS = 10;
-const COLS = 20;
+const ROWS = 23;
+const COLS = 40;
+const OBJECT_SIZE = Math.floor(TILE_SIZE / 2);
+const PLAYER_SIZE = Math.floor((TILE_SIZE * 3) / 4);
+const KEYCAP_SIZE = Math.floor((TILE_SIZE * 5) / 8);
+const KEYCAP_INNER_SIZE = Math.floor(TILE_SIZE / 2);
+const OBJECT_OFFSET = Math.floor((TILE_SIZE - OBJECT_SIZE) / 2);
+const PLAYER_OFFSET = Math.floor((TILE_SIZE - PLAYER_SIZE) / 2);
+const KEYCAP_OFFSET = Math.floor((TILE_SIZE - KEYCAP_SIZE) / 2);
+const KEYCAP_INNER_OFFSET = Math.floor((KEYCAP_SIZE - KEYCAP_INNER_SIZE) / 2);
+
+canvas.width = COLS * TILE_SIZE;
+canvas.height = ROWS * TILE_SIZE;
 
 // Initialize empty map
 let map = Array.from({ length: ROWS }, () => Array(COLS).fill(0));
@@ -77,8 +88,8 @@ function draw() {
             if (tile === 0) continue;
 
             if (tile === 1) { ctx.fillStyle = "#666"; ctx.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE); }
-            else if (tile === 2) { ctx.fillStyle = "#00ff88"; ctx.fillRect(x * TILE_SIZE + 8, y * TILE_SIZE + 8, 16, 16); }
-            else if (tile === 3) { ctx.fillStyle = "#ff3366"; ctx.fillRect(x * TILE_SIZE + 4, y * TILE_SIZE + 4, 24, 24); } // Player visualization
+            else if (tile === 2) { ctx.fillStyle = "#00ff88"; ctx.fillRect(x * TILE_SIZE + OBJECT_OFFSET, y * TILE_SIZE + OBJECT_OFFSET, OBJECT_SIZE, OBJECT_SIZE); }
+            else if (tile === 3) { ctx.fillStyle = "#ff3366"; ctx.fillRect(x * TILE_SIZE + PLAYER_OFFSET, y * TILE_SIZE + PLAYER_OFFSET, PLAYER_SIZE, PLAYER_SIZE); }
             else if (tile === 4) { ctx.fillStyle = "#ffd700"; ctx.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE); }
             else if (tile === 5) { ctx.fillStyle = "#ff4444"; ctx.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE); }
             else if (tile === 6) {
@@ -86,9 +97,18 @@ function draw() {
                 ctx.strokeStyle = "#4444ff"; ctx.lineWidth = 2; ctx.strokeRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
             }
             else if (tile === 7) {
-                ctx.fillStyle = "#00ccff"; ctx.beginPath(); ctx.moveTo(x * TILE_SIZE + 16, y * TILE_SIZE + 4); ctx.lineTo(x * TILE_SIZE + 28, y * TILE_SIZE + 16); ctx.lineTo(x * TILE_SIZE + 16, y * TILE_SIZE + 28); ctx.lineTo(x * TILE_SIZE + 4, y * TILE_SIZE + 16); ctx.fill();
+                const centerX = x * TILE_SIZE + (TILE_SIZE / 2);
+                const centerY = y * TILE_SIZE + (TILE_SIZE / 2);
+                const halfObject = OBJECT_SIZE / 2;
+                ctx.fillStyle = "#00ccff";
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY - halfObject);
+                ctx.lineTo(centerX + halfObject, centerY);
+                ctx.lineTo(centerX, centerY + halfObject);
+                ctx.lineTo(centerX - halfObject, centerY);
+                ctx.fill();
             }
-            else if (tile === 8) { ctx.fillStyle = "#0044ff"; ctx.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE); ctx.fillStyle = "#00ccff"; ctx.fillRect(x * TILE_SIZE + 8, y * TILE_SIZE + 8, 16, 16); }
+            else if (tile === 8) { ctx.fillStyle = "#0044ff"; ctx.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE); ctx.fillStyle = "#00ccff"; ctx.fillRect(x * TILE_SIZE + OBJECT_OFFSET, y * TILE_SIZE + OBJECT_OFFSET, OBJECT_SIZE, OBJECT_SIZE); }
             else if (tile === 9) { ctx.fillStyle = "#ff0000"; ctx.beginPath(); ctx.moveTo(x * TILE_SIZE + 16, y * TILE_SIZE + 8); ctx.lineTo(x * TILE_SIZE + 32, y * TILE_SIZE + 32); ctx.lineTo(x * TILE_SIZE, y * TILE_SIZE + 32); ctx.fill(); }
             else if (tile === 10) { ctx.fillStyle = "#999999"; ctx.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE / 4); }
             else if (tile === 11) { 
@@ -105,7 +125,7 @@ function draw() {
             }
             else if (tile === 14) { 
                 ctx.fillStyle = "#FFD700"; ctx.beginPath(); ctx.arc(x * TILE_SIZE + 10, y * TILE_SIZE + 16, 6, 0, Math.PI * 2); ctx.fill();
-                ctx.fillRect(x * TILE_SIZE + 10, y * TILE_SIZE + 14, 14, 4); ctx.fillRect(x * TILE_SIZE + 20, y * TILE_SIZE + 18, 4, 4); 
+                ctx.fillRect(x * TILE_SIZE + 10, y * TILE_SIZE + 14, 14, 4); ctx.fillRect(x * TILE_SIZE + 20, y * TILE_SIZE + 18, 4, 4);
             }
             else if (tile === 15) { 
                 ctx.fillStyle = "#5c3a21"; ctx.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
@@ -239,9 +259,9 @@ function draw() {
             else if (tile === 27) {
                 // Draw a little keyboard keycap
                 ctx.fillStyle = "#a0a0a0"; 
-                ctx.fillRect(x * TILE_SIZE + 6, y * TILE_SIZE + 6, 20, 20);
+                ctx.fillRect(x * TILE_SIZE + KEYCAP_OFFSET, y * TILE_SIZE + KEYCAP_OFFSET, KEYCAP_SIZE, KEYCAP_SIZE);
                 ctx.fillStyle = "#e0e0e0"; 
-                ctx.fillRect(x * TILE_SIZE + 8, y * TILE_SIZE + 6, 16, 16);
+                ctx.fillRect(x * TILE_SIZE + KEYCAP_OFFSET + KEYCAP_INNER_OFFSET, y * TILE_SIZE + KEYCAP_OFFSET, KEYCAP_INNER_SIZE, KEYCAP_INNER_SIZE);
             }
         }
     }

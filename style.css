@@ -11,8 +11,8 @@ body {
 
 #gameContainer {
     position: relative;
-    width: min(100vw, calc(100vh * 2)); 
-    aspect-ratio: 2 / 1; /* Locks it perfectly to your 640x320 resolution */
+    width: min(100vw, calc(100vh * 1.7391304348));
+    aspect-ratio: 40 / 23;
     
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
 }
