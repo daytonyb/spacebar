@@ -239,3 +239,45 @@ button:disabled {
     cursor: pointer;
     appearance: none; /* Removes default dropdown arrow to keep it clean */
 }
+
+/* --- Sign Popout --- */
+#signPopout {
+    position: absolute;
+    bottom: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(30, 20, 15, 0.95);
+    border: 4px solid #8B4513;
+    border-radius: 8px;
+    padding: 25px;
+    width: 80%;
+    max-width: 600px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+    z-index: 50;
+    /* Smooth fade in/out */
+    transition: opacity 0.2s ease;
+}
+
+#signPopout.hidden {
+    opacity: 0;
+    pointer-events: none; /* Prevents clicking when hidden */
+    display: block !important; /* Overrides the default .hidden display:none so we can animate it */
+}
+
+#signText {
+    color: white;
+    font-size: 24px;
+    line-height: 1.5;
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+#btnCloseSign {
+    background-color: #8B4513;
+}
+
+#btnCloseSign:hover {
+    background-color: #A0522D;
+}
