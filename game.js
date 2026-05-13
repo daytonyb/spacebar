@@ -58,14 +58,19 @@ let hasEscortKey = false;
 let activeRoomPortals = [];
 let lockedPortalKey = null;
 const KEYCAP_TILE = 27;
+const PEDESTAL_TILE = 28; // NEW: The Lore Pedestal
 let permanentlyCollectedKeycaps = JSON.parse(localStorage.getItem("collectedKeycaps")) || {};
 let currentlyHeldKeycaps = [];
 let collectParticles = [];
 let canReadSign = false;
 let isSignOpen = false;
 let pendingSignText = "";
+let pendingSignType = "sign"; // NEW: Tracks if we are reading a 'sign' or 'pedestal'
 let activeSignX = 0;
 let activeSignY = 0;
+let typewriterInterval = null;
+let isTyping = false;
+let currentTextToType = "";
 
 const stages = [
     {
@@ -101,7 +106,7 @@ const stages = [
   [1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
   [1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
   [1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,28,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
   [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
   [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -111,7 +116,7 @@ const stages = [
   [1,1,1,1,1,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1],
   [1,1,1,1,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1],
   [1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1],
-  [1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,0,0,0,0,0,0,0,1,1],
+  [1,1,1,1,1,0,0,0,0,0,0,0,27,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,0,0,0,0,0,0,0,1,1],
   [1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0,1],
   [1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,1],
   [1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1],
@@ -132,19 +137,19 @@ const stages = [
   [0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0],
   [0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0],
   [0,4,0,0,0,2,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0],
-  [1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0],
-  [1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,2,0,0,0,0,0],
-  [1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,0,0,1],
-  [1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,1,1,1,1,0,0,1],
-  [1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,1,0,0,1],
-  [1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1],
-  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,9,0,0,0,0,0,0,0,0,1],
-  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1],
-  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,2,0,0,0,0,0,0,0,1],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,1],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,9,2,0,0,0,0,0,1],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,9,0,2,0,0,1],
-  [9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,1,1,1,1,1,1,1,1,1,1,1,1,1]
+  [1,1,1,1,1,1,1,1,0,0,0,0,0,0,27,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0],
+  [1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,1,1,28,0,0,2,0,0,0,0,0],
+  [1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,0,0,1],
+  [1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,0,0,1],
+  [1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,1,1,1,1,1,1,1,1,1,0,0,1],
+  [1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,0,0,0,1],
+  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,0,0,0,1],
+  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,1,1,1,1,1,1,1,1,0,0,0,0,1],
+  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,0,0,0,0,1],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,1,1,1,1,1,1,1,1,1,0,0,0,0,1],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,0,0,0,0,0,1],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,1,1,1,1,1,1,1,1,1,0,0,0,0,0,1],
+  [9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,1,1,1,1,1,1,1,1,1,1,9,9,9,9,9,1]
 ],
 "3,0": [
   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1],
@@ -158,7 +163,7 @@ const stages = [
   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,0,0,0,0,0,0,1,1,1,1,1,1],
   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,1,1,1,1,1],
   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1,1,1,1],
-  [0,4,0,0,0,0,0,11,0,0,0,0,0,0,0,0,0,7,0,0,0,1,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1],
+  [0,4,0,0,0,0,0,11,0,0,0,0,0,0,0,0,0,7,0,0,0,1,0,1,1,1,0,0,0,0,27,0,0,0,0,0,0,0,1,1],
   [1,1,1,1,1,1,1,1,1,1,0,0,0,1,1,1,1,1,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
   [1,1,1,1,1,1,1,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
   [1,1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -172,16 +177,16 @@ const stages = [
   [1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 ],
 "4,0": [
-  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-  [1,1,1,0,0,0,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,0,0,0,1,1,1],
-  [1,0,0,0,0,0,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,0,0,0,0,0,1],
-  [0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0],
-  [0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0],
-  [0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0],
-  [0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0],
-  [0,4,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,8,0],
-  [1,1,1,1,1,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,1,1,1,1,1],
-  [1,1,1,1,1,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,1,1,1,1,1],
+  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+  [1,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,1],
+  [0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,0],
+  [1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1],
+  [1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1],
   [1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1],
   [1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1],
   [1,1,1,1,1,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,0,0,0,1,1,1,1,1],
@@ -199,8 +204,13 @@ const stages = [
         },
         roomNames: {},
         signs: {
-            "0,0": "Collect the green Jump Potions to gain jumps, and press Spacebar to use them. Use them to make it across the gap and enter the next room.",
-            "3,0": "Dashing allows you to cross gaps without jumping. Press Left Shift while holding the direction you want to dash in. Blue Dash Crystals will give you another dash in a room."
+            "0,0": "Since the Space Bar disappeared in 2088, the people in this world haven't been able to jump. Luckily, the kind and benevolent Captain John Doe has left Jump Potions around the world to help you move around.",
+            "3,0": "One way the Ancients moved around the world is by Dashing. Pressing Left Shift while holding down a direction will allow you to harness their power 1 time per room. Luckily, these Ancient Spirits have taken the form of Crystals that will give you another one when obtained."
+        },
+        lore: {
+            "1,0": 'Feburary 12th, 2088: \n\nIt was a week ago that the Space Bar was stolen... I have too many questions and not enough answers... Who took it from us? Where did they bring it? What are they planning to do? I can only hope that one day these questions will be answered.\n\n - John Doe, Captain of The Mechanical Core',
+            "2,0": "November 7th, 2092: \n\nI've heard rumors of some Ancient Spirits residing in a cave. I have no clue how this could relate to the Space Bar but it's the only thing I've found. \n\n - John Doe, Captain of The Mechanical Core",
+
         }
     },
 
@@ -309,13 +319,39 @@ const signTextEl = document.getElementById("signText");
 function openSign() {
     if (!canReadSign || isSignOpen) return;
     isSignOpen = true;
-    signTextEl.innerText = pendingSignText;
-    signPopout.classList.remove("hidden");
+    
+    // Apply the correct visual theme
+    signPopout.classList.remove("theme-sign", "theme-pedestal", "hidden");
+    signPopout.classList.add(pendingSignType === "pedestal" ? "theme-pedestal" : "theme-sign");
+
+    // Start Typewriter Effect
+    signTextEl.textContent = ""; // Use textContent instead of innerText
+    currentTextToType = pendingSignText;
+    isTyping = true;
+    let charIndex = 0;
+
+    if (typewriterInterval) clearInterval(typewriterInterval);
+    
+    // Adjust speed based on theme (pedestals print faster like code)
+    let typingSpeed = pendingSignType === "pedestal" ? 15 : 30;
+
+    typewriterInterval = setInterval(() => {
+        if (charIndex < currentTextToType.length) {
+            // Append using textContent so trailing spaces aren't swallowed
+            signTextEl.textContent += currentTextToType.charAt(charIndex);
+            charIndex++;
+        } else {
+            isTyping = false;
+            clearInterval(typewriterInterval);
+        }
+    }, typingSpeed);
 }
 
 function closeSign() {
     isSignOpen = false;
     signPopout.classList.add("hidden");
+    if (typewriterInterval) clearInterval(typewriterInterval);
+    isTyping = false;
 }
 
 document.getElementById("btnCloseSign").onclick = closeSign;
@@ -578,12 +614,19 @@ window.addEventListener("keydown", (e) => {
         return;
     }
 
-    // Inside the keydown listener...
-    if (e.code === "KeyB") {
+if (e.code === "KeyB") {
         e.preventDefault();
-        // If they are on a sign, toggle it. Otherwise, die() like normal.
         if (canReadSign) {
-            if (isSignOpen) closeSign();
+            if (isSignOpen) {
+                if (isTyping) {
+                    // Skip typing effect and show full text instantly
+                    clearInterval(typewriterInterval);
+                    signTextEl.textContent = currentTextToType; // Use textContent here too
+                    isTyping = false;
+                } else {
+                    closeSign();
+                }
+            }
             else openSign();
         }
     }
@@ -985,26 +1028,36 @@ function checkInteractions(px, py) {
         
         if (centerTile !== PORTAL_TILE) lockedPortalKey = null;
 
-        // --- UPDATED SIGN LOGIC ---
-        if (centerTile === 11) {
+// --- UPDATED SIGN & PEDESTAL LOGIC ---
+        if (centerTile === 11 || centerTile === PEDESTAL_TILE) {
             const currentStage = stages[currentStageIndex];
             const roomKey = `${currentRoomX},${currentRoomY}`;
             
-            if (currentStage.signs && currentStage.signs[roomKey]) {
+            // Check for Tutorial Signs (Tile 11)
+            if (centerTile === 11 && currentStage.signs && currentStage.signs[roomKey]) {
                 canReadSign = true;
                 pendingSignText = currentStage.signs[roomKey];
-                
-                // Save the exact coordinates of the sign so we know where to draw the "R"
+                pendingSignType = "sign"; // Set theme
+            } 
+            // Check for Lore Pedestals (Tile 28)
+            else if (centerTile === PEDESTAL_TILE && currentStage.lore && currentStage.lore[roomKey]) {
+                canReadSign = true;
+                pendingSignText = currentStage.lore[roomKey];
+                pendingSignType = "pedestal"; // Set theme
+            }
+
+            if (canReadSign) {
+                // Save coordinates to draw the "B" bubble over the object
                 activeSignX = cx * TILE_SIZE;
                 activeSignY = cy * TILE_SIZE;
             }
         } else {
-            // If we step off the sign, but the HTML popout is still open, force it closed
+            // If we step off the sign/pedestal, but the HTML popout is open, force it closed
             if (isSignOpen) {
                 closeSign();
             }
         }
-        // --------------------------
+        // -------------------------------------
 
         // Keep the rest of your interactions exactly the same!
         if (centerTile === 4) activeCheckpoint = { rx: currentRoomX, ry: currentRoomY, px: cx * TILE_SIZE + PLAYER_OFFSET, py: cy * TILE_SIZE + PLAYER_OFFSET, cx, cy };
@@ -1750,10 +1803,31 @@ function draw() {
                     ctx.fillStyle = "#555";
                 }
                 
-                ctx.font = "bold 12px monospace";
+                ctx.font = "10px 'Press Start 2P'";
                 ctx.textAlign = "center";
                 ctx.textBaseline = "middle";
                 ctx.fillText("?", left + (KEYCAP_SIZE / 2), top + (KEYCAP_INNER_SIZE / 2));
+            }
+            else if (tile === PEDESTAL_TILE) {
+                const left = x * TILE_SIZE;
+                const top = y * TILE_SIZE;
+
+                // Ancient Stone/Metal Base
+                ctx.fillStyle = "#5c6b73";
+                ctx.fillRect(left + 6, top + 20, 20, 12);
+                ctx.fillStyle = "#3d4b53";
+                ctx.fillRect(left + 8, top + 16, 16, 4);
+
+                // Glowing Hologram/Data floating above it
+                const floatOffset = Math.sin(performance.now() / 200) * 3;
+                ctx.fillStyle = "rgba(15, 211, 255, 0.7)"; 
+                
+                ctx.beginPath();
+                ctx.moveTo(left + 16, top + 6 + floatOffset);
+                ctx.lineTo(left + 22, top + 12 + floatOffset);
+                ctx.lineTo(left + 16, top + 18 + floatOffset);
+                ctx.lineTo(left + 10, top + 12 + floatOffset);
+                ctx.fill();
             }
         }
     }
@@ -1782,7 +1856,7 @@ function draw() {
 
         // Draw "B" text
         ctx.fillStyle = "black";
-        ctx.font = "16px sans-serif";
+        ctx.font = "10px 'Press Start 2P'";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillText("B", drawX, drawY + 2);
@@ -1848,7 +1922,7 @@ function draw() {
                 ctx.fillStyle = "#555";
             }
             
-            ctx.font = "bold 12px monospace";
+            ctx.font = "10px 'Press Start 2P'";
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
             ctx.fillText("?", keyX + (KEYCAP_SIZE / 2), keyY + (KEYCAP_INNER_SIZE / 2));

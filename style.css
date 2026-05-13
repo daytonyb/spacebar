@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
 body {
     margin: 0;
     background-color: #1a1a1a;
@@ -5,8 +7,9 @@ body {
     align-items: center;
     justify-content: center;
     height: 100vh;
-    font-family: sans-serif;
-    overflow: hidden; /* This prevents annoying scrollbars when the game touches the edges */
+    /* Use the pixel font */
+    font-family: 'Press Start 2P', cursive; 
+    overflow: hidden;
 }
 
 #gameContainer {
@@ -159,7 +162,7 @@ button:disabled {
     font-size: 24px;
     font-weight: bold;
     pointer-events: none; /* This ensures the text never accidentally blocks clicks */
-    text-shadow: 2px 2px 0px rgba(0,0,0,0.8); /* Adds a nice drop shadow! */
+    text-shadow: 2px 2px 0px #000000; /* No blur, just a solid offset block */
 }
 
 /* --- Settings & Keybinds --- */
@@ -172,6 +175,7 @@ button:disabled {
     border-radius: 8px;
     border: 2px solid #555;
     width: 250px;
+    font-family: 'Sans-serif', cursive;
 }
 
 .keybind-row {
@@ -179,6 +183,7 @@ button:disabled {
     justify-content: space-between;
     align-items: center;
     font-size: 18px;
+        font-family: 'Sans-serif', cursive;
 }
 
 .bind-btn {
@@ -209,9 +214,8 @@ button:disabled {
     right: 24px;
     color: #00ff88;
     font-size: 20px;
-    font-family: monospace;
     font-weight: bold;
-    text-shadow: 2px 2px 0px rgba(0,0,0,0.8);
+    text-shadow: 2px 2px 0px #000000; /* No blur, just a solid offset block */
     cursor: help; /* Adds a nice question mark cursor when hovering! */
 }
 
@@ -224,7 +228,6 @@ button:disabled {
     border: 2px solid #555;
     pointer-events: none;
     z-index: 100;
-    font-family: monospace;
     font-size: 14px;
     white-space: nowrap;
 }
@@ -232,7 +235,6 @@ button:disabled {
 .select-btn {
     text-align: center;
     padding: 5px;
-    font-family: inherit;
     font-weight: bold;
     border: none;
     border-radius: 4px;
@@ -240,44 +242,96 @@ button:disabled {
     appearance: none; /* Removes default dropdown arrow to keep it clean */
 }
 
-/* --- Sign Popout --- */
+/* --- Sign Popout Base --- */
 #signPopout {
     position: absolute;
     bottom: 50px;
     left: 50%;
     transform: translateX(-50%);
-    background-color: rgba(30, 20, 15, 0.95);
-    border: 4px solid #8B4513;
     border-radius: 8px;
     padding: 25px;
     width: 80%;
     max-width: 600px;
-    text-align: center;
+    text-align: left; /* Left align for easier reading */
     box-shadow: 0 10px 30px rgba(0,0,0,0.8);
     z-index: 50;
-    /* Smooth fade in/out */
-    transition: opacity 0.2s ease;
+    transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
 #signPopout.hidden {
     opacity: 0;
-    pointer-events: none; /* Prevents clicking when hidden */
-    display: block !important; /* Overrides the default .hidden display:none so we can animate it */
+    pointer-events: none;
+    display: block !important;
+    transform: translate(-50%, 10px); /* Gives a slight 'slide up' animation when opening */
 }
 
 #signText {
-    color: white;
-    font-size: 24px;
-    line-height: 1.5;
+    font-size: 20px;
+    line-height: 1.6;
     margin-top: 0;
     margin-bottom: 20px;
-    font-weight: bold;
+    min-height: 60px;
+    white-space: pre-wrap; /* The magic fix for spaces and \n line breaks */
+    word-wrap: break-word; /* Ensures long lines don't break out of the box */
 }
 
-#btnCloseSign {
+/* --- Theme: Wooden Sign --- */
+.theme-sign {
+    background-color: rgba(40, 25, 15, 0.95);
+    border: 4px solid #8B4513;
+}
+.theme-sign #signText {
+    color: #f4e4d4;
+    font-family: sans-serif;
+    font-family: 'Press Start 2P', cursive;
+}
+.theme-sign #btnCloseSign {
     background-color: #8B4513;
+    color: white;
+}
+.theme-sign #btnCloseSign:hover {
+    background-color: #A0522D;
 }
 
-#btnCloseSign:hover {
-    background-color: #A0522D;
+/* --- Theme: Lore Pedestal (Holographic) --- */
+.theme-pedestal {
+    background-color: rgba(10, 20, 30, 0.95);
+    border: 2px solid #0fd3ff;
+    box-shadow: 0 0 20px rgba(15, 211, 255, 0.3), inset 0 0 15px rgba(15, 211, 255, 0.1);
+}
+.theme-pedestal #signText {
+    color: #8fe8ff;
+    font-family: monospace; /* Gives it a data-log feel */
+    text-shadow: 2px 2px 0px #000000; /* No blur, just a solid offset block */
+}
+.theme-pedestal #btnCloseSign {
+    background-color: rgba(15, 211, 255, 0.1);
+    color: #0fd3ff;
+    border: 1px solid #0fd3ff;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+.theme-pedestal #btnCloseSign:hover {
+    background-color: rgba(15, 211, 255, 0.4);
+    color: white;
+}
+
+/* HUD Text Tweaks */
+#hudLevelName, #hudTimer {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 16px;
+    letter-spacing: 1px;
+}
+
+/* Sign Popout Tweaks */
+#signText {
+    font-size: 14px; /* Scaled down for readability in pixel font */
+    line-height: 1.8;
+    font-family: 'Press Start 2P', cursive;
+}
+
+/* Make the Holographic pedestal text look extra "glitchy" */
+.theme-pedestal #signText {
+    font-family: 'Press Start 2P', cursive;
+    text-shadow: 2px 2px 0px #000000; /* No blur, just a solid offset block */
 }
